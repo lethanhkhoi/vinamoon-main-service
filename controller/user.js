@@ -10,7 +10,7 @@ async function getAll (req,res){
     return res.json({data})
 }
 async function login(req,res){
-    const user = await database.userModel().findOne({email: req.body.email})
+    const user = await database.userModel().findOne({phone: req.body.phone})
     if(!user){
         return res.json({errorCode: true, data: "Tai khoan khong ton tai"})
     }
@@ -19,13 +19,12 @@ async function login(req,res){
         return res.json({errorCode: true, data: "Pass sai"})
     }
     if(!user.token){
-        user.token = await jwt.createSecretKey(req.body.email)
+        user.token = await jwt.createSecretKey(req.body.phone)
     }
     return res.json({errorCode: null,data: user})
 }
 async function register(req,res){
-    console.log("TEST")
-    const user = await database.userModel().findOne({email: req.body.email})
+    const user = await database.userModel().findOne({phone: req.body.phone})
     if(user){
         return res.json({errorCode: true, data: "Tai khoan da ton tai"})
     }
@@ -35,7 +34,6 @@ async function register(req,res){
     }
     const password = await bcrypt.hash(req.body.password, saltRounds)
     const data = {
-        email: req.body.email,
         password: password,
         name: req.body.name,
         phone: req.body.phone,
@@ -47,7 +45,7 @@ async function register(req,res){
     }
     await userCol.create(data)
     if(!data.token){
-        data.token = await jwt.createSecretKey(req.body.email)
+        data.token = await jwt.createSecretKey(req.body.phone)
     }
     return res.json({errorCode: null,data: data})
 }
