@@ -15,15 +15,16 @@ async function login(req,res){
         return res.json({errorCode: true, data: "Tai khoan khong ton tai"})
     }
     const checkPass = await bcrypt.compare(req.body.password, user.password)
-    // if(!checkPass){
-    //     return res.json({errorCode: true, data: "Pass sai"})
-    // }
+    if(!checkPass){
+        return res.json({errorCode: true, data: "Pass sai"})
+    }
     if(!user.token){
         user.token = await jwt.createSecretKey(req.body.email)
     }
     return res.json({errorCode: null,data: user})
 }
 async function register(req,res){
+    console.log("TEST")
     const user = await database.userModel().findOne({email: req.body.email})
     if(user){
         return res.json({errorCode: true, data: "Tai khoan da ton tai"})
@@ -41,7 +42,7 @@ async function register(req,res){
         address: req.body.address,
         gender: req.body.gender,
         birthday: req.body.birthday? moment(req.body.birthday, "DD/MM/YYYY").utc().toDate(): null,
-        voucher: [],
+        role: req.body.role? req.body.role : "user",
         createdAt: new Date()
     }
     await userCol.create(data)

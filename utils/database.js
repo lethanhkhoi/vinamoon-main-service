@@ -6,11 +6,11 @@ async function connectDatabase(cb) {
     const client = new MongoClient(config.uri);
     try {
       await client.connect();
-      let db = await client.db('Ecommerce');
+      let db = await client.db('bus');
       console.log("connect to DB Success", config.uri);
   
       // Authentication
-      _userModel = db.collection("User");
+      _userModel = db.collection("user");
   
       dbClient = client;
   
