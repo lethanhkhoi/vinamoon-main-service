@@ -20,5 +20,19 @@ commands =[
         api:"/register",
         middleware:[]
     },
+    {
+        name:"verify",
+        controller:"user",
+        method:"get",
+        api:"/verify",
+        middleware:[]
+    },
+    {
+        name:"refreshToken",
+        controller:"user",
+        method:"post",
+        api:"/token",
+        middleware:[]
+    },
 ]
 module.exports= commands
