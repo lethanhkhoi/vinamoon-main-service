@@ -8,7 +8,7 @@ const saltRounds = 10;
 
 async function getAll(req, res) {
   const data = await userCol.getAll();
-  return res.json({ data });
+  return res.json({ errorCode: null, data });
 }
 async function login(req, res) {
   const user = await database.userModel().findOne({ phone: req.body.phone });
@@ -112,7 +112,7 @@ async function verify(req, res, next) {
 }
 
 async function refreshToken(req, res) {
-  let {refreshToken} = req.body;
+  let { refreshToken } = req.body;
   if (!refreshToken) {
     return res.status(401).json({
       errCode: true,
@@ -150,7 +150,10 @@ async function refreshToken(req, res) {
         data: "account not found",
       });
     }
-    const newToken = await jwt.createSecretKey({ phone: account[0].phone }, refreshToken);
+    const newToken = await jwt.createSecretKey(
+      { phone: account[0].phone },
+      refreshToken
+    );
     account[0].token = newToken.token;
     refreshTokens[refreshToken].token = newToken.token;
     // update the token in the list
@@ -163,10 +166,59 @@ async function refreshToken(req, res) {
     res.status(404).send("Invalid request");
   }
 }
+
+async function userAuthentication(req, res, next) {
+  let token = req.headers["token"];
+
+  if (!token) {
+    return res.json({
+      errCode: true,
+      data: "authentication fail",
+    });
+  }
+
+  try {
+    var payload = await jwt.decodeToken(token);
+  } catch (e) {
+    res.status(401);
+    return res.json({
+      errCode: true,
+      data: "jwt malformed",
+    });
+  }
+
+  if (!payload) {
+    return res.json({
+      errCode: true,
+      data: "authentication fail",
+    });
+  }
+
+  let account = [];
+  account = await database.userModel().find({ email: payload }).toArray();
+
+  if (account.length == 0 || account.length > 1) {
+    res.status(401);
+    return res.json({
+      errCode: true,
+      data: "account not found",
+    });
+  }
+
+  req.user = (({ _id, email, firstName, lastName }) => ({
+    _id,
+    email,
+    firstName,
+    lastName,
+  }))(account[0]);
+
+  return next();
+}
 module.exports = {
   getAll,
   login,
   verify,
   register,
-  refreshToken
+  refreshToken,
+  userAuthentication
 };

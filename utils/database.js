@@ -2,6 +2,7 @@ const { MongoClient } = require("mongodb");
 const config = require('../config/database.json');
 
 let _userModel =null
+let _requestModel =null
 async function connectDatabase(cb) {
     const client = new MongoClient(config.uri);
     try {
@@ -11,7 +12,7 @@ async function connectDatabase(cb) {
   
       // Authentication
       _userModel = db.collection("user");
-  
+      _requestModel = db.collection("request");
       dbClient = client;
   
       cb();
@@ -28,7 +29,17 @@ const userModel = function () {
       return _userModel;
     }
 };
+
+const requestModel = function () {
+  if (_requestModel == null) {
+    console.log("Instance is null or undefined");
+  } else {
+    return _requestModel;
+  }
+};
+
 module.exports ={
     userModel,
+    requestModel,
     connectDatabase
 }
