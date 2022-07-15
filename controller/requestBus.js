@@ -1,5 +1,6 @@
 const requestBus = require("../dataModel/requestBusCol");
 async function getAll(req, res) {
+  console.log(req.user)
   const data = await requestBus.getAll();
   return res.json({ errorCode: null, data });
 }
