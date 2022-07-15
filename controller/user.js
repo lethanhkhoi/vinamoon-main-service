@@ -170,6 +170,8 @@ const axios = require("axios");
 async function userAuthentication(req, res, next) {
   let token = req.headers["token"];
   console.log(token);
+  console.log("TES");
+
   if (!token) {
     return res.status(401).json({
       errCode: true,
@@ -183,16 +185,25 @@ async function userAuthentication(req, res, next) {
       "Content-Type": "application/json",
       token: token,
     },
-  });
-  if (response === true) {
-    return res.status(401).json({
-      errCode: true,
-      data: "authentication fail",
+  })
+    .then((response) => {
+      console.log(response);
+      if (response.errCode === true || response.status === 401) {
+        return res.json({
+          errCode: true,
+          data: "authentication fail",
+        });
+      }
+      const data = response.data.data;
+      req.user = { _id: data._id, phone: data.phone, name: data.name };
+      return next();
+    })
+    .catch((error) => {
+      return res.json({
+        errCode: true,
+        data: "authentication fail",
+      });
     });
-  }
-  const data = response.data.data;
-  req.user = { _id: data._id, phone: data.phone, name: data.name };
-  return next();
 }
 module.exports = {
   userAuthentication,
