@@ -1,10 +1,3 @@
-const userCol = require("../dataModel/userCol");
-const database = require("../utils/database");
-const jwt = require("../utils/token");
-const bcrypt = require("bcrypt");
-const moment = require("moment");
-let refreshTokens = {};
-const saltRounds = 10;
 const axios = require("axios");
 // async function getAll(req, res) {
 //   const data = await userCol.getAll();
@@ -187,7 +180,6 @@ async function userAuthentication(req, res, next) {
     },
   })
     .then((response) => {
-      console.log(response);
       if (response.errCode === true || response.status === 401) {
         return res.json({
           errCode: true,

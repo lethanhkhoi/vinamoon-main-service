@@ -4,7 +4,14 @@ commands =[
         controller:"requestBus",
         method:"get",
         api:"/requestBus",
-        middleware:["authentication"]
+        middleware:[]
+    },
+    {
+        name:"getOne",
+        controller:"requestBus",
+        method:"get",
+        api:"/requestBus/:code",
+        middleware:[]
     },
     {
         name:"create",

@@ -1,25 +1,42 @@
 const requestBus = require("../dataModel/requestBusCol");
+const pickingAdress = require("./pickingAdress.js");
+const ObjectID = require("mongodb").ObjectId;
 async function getAll(req, res) {
-  console.log(req.user)
   const data = await requestBus.getAll();
   return res.json({ errorCode: null, data });
 }
-async function create(req,res){
-    const data = req.body
-    for (property in requestBus.validateRequest){
-        if(data[property] === null){
-            return res.json({errorCode: true, data: `Please input ${property}`})
-        }
+async function create(req, res) {
+  const data = req.body;
+  const user = req.body.phone ?? req.user.phone;
+  for (property in requestBus.validateRequest) {
+    if (data[property] === null) {
+      return res.json({ errorCode: true, data: `Please input ${property}` });
     }
-    data.date = new Date()
-    data.status = "Pending"
-    const result = await requestBus.create(data)
-    if (!result) {
-        return res.json({ errorCode: true, data: "System error" });
-      }
-      return res.json({ errorCode: null, data: data });
+  }
+  data.date = new Date();
+  data.status = "Pending";
+  data.id = ObjectID().toString();
+  const pickingAddressResult = await pickingAdress.create(data.pickingAdress, user)
+  if (!pickingAddressResult) {
+    return res.json({ errorCode: true, data: "System error" });
+  }
+  data.pickingAdress = pickingAddressResult.id
+  const result = await requestBus.create(data);
+  if (!result) {
+    return res.json({ errorCode: true, data: "System error" });
+  }
+  return res.json({ errorCode: null, data: data });
+}
+async function getOne(req, res) {
+  const code = req.params.code;
+  const result = await requestBus.getOne(code);
+  if (!result) {
+    return res.json({ errorCode: true, data: "Cannot found the request" });
+  }
+  return res.json({ errorCode: null, data: result });
 }
 module.exports = {
   getAll,
-  create
+  create,
+  getOne,
 };
