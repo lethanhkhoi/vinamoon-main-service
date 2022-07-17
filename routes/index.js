@@ -1,13 +1,16 @@
 const userCommand = require("./user.js")
 const requestBusCommand = require("./requestBus.js")
+const pickingAddressCommand = require("./pickingAddress.js")
 
 const event = [
     userCommand,
-    requestBusCommand
+    requestBusCommand,
+    pickingAddressCommand
 ]
 const controllers = {
     user : require("../controller/user.js"),
-    requestBus: require("../controller/requestBus.js")
+    requestBus: require("../controller/requestBus.js"),
+    pickingAddress: require("../controller/pickingAddress.js"),
 }
 
 const middlewares = {

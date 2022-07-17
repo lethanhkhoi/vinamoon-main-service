@@ -1,5 +1,5 @@
 const requestBus = require("../dataModel/requestBusCol");
-const pickingAdress = require("./pickingAdress.js");
+const pickingAddress = require("./pickingAddress.js");
 const ObjectID = require("mongodb").ObjectId;
 async function getAll(req, res) {
   const data = await requestBus.getAll();
@@ -16,11 +16,11 @@ async function create(req, res) {
   data.date = new Date();
   data.status = "Pending";
   data.id = ObjectID().toString();
-  const pickingAddressResult = await pickingAdress.create(data.pickingAdress, user)
+  const pickingAddressResult = await pickingAddress.create(data.pickingAddress, user)
   if (!pickingAddressResult) {
     return res.json({ errorCode: true, data: "System error" });
   }
-  data.pickingAdress = pickingAddressResult.id
+  data.pickingAddress = pickingAddressResult.id
   const result = await requestBus.create(data);
   if (!result) {
     return res.json({ errorCode: true, data: "System error" });

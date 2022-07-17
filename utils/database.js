@@ -3,7 +3,7 @@ const config = require('../config/database.json');
 
 let _userModel =null
 let _requestModel =null
-let _pickingAdressModel =null
+let _pickingAddressModel =null
 async function connectDatabase(cb) {
     const client = new MongoClient(config.uri);
     try {
@@ -14,7 +14,7 @@ async function connectDatabase(cb) {
       // Authentication
       _userModel = db.collection("user");
       _requestModel = db.collection("request");
-      _pickingAdressModel = db.collection("picking_address")
+      _pickingAddressModel = db.collection("picking_address")
       dbClient = client;
   
       cb();
@@ -40,17 +40,17 @@ const requestModel = function () {
   }
 };
 
-const pickingAdressModel = function () {
-  if (_pickingAdressModel == null) {
+const pickingAddressModel = function () {
+  if (_pickingAddressModel == null) {
     console.log("Instance is null or undefined");
   } else {
-    return _pickingAdressModel;
+    return _pickingAddressModel;
   }
 };
 
 module.exports ={
     userModel,
     requestModel,
-    pickingAdressModel,
+    pickingAddressModel,
     connectDatabase
 }

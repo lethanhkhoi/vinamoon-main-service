@@ -20,20 +20,26 @@ async function getOne(data) {
       },
     ],
   };
-  const result = await database.pickingAdressModel().aggregate([{$match : match}]).toArray();
+  const result = await database.pickingAddressModel().aggregate([{$match : match}]).toArray();
   if (!result || result.length > 1) {
     return null;
   }
   return result[0];
 }
+
+async function getOneByCode(code){
+  const result = await database.pickingAddressModel().findOne({id: code})
+  return result
+}
+
 async function create(data){
     data["createdAt"] = new Date()
-    const result = await database.pickingAdressModel().insertOne(data)
+    const result = await database.pickingAddressModel().insertOne(data)
     return result
 }
 async function update(code, data){
     data["updatedAt"] = new Date()
-    const result = await database.pickingAdressModel().findOneAndUpdate(
+    const result = await database.pickingAddressModel().findOneAndUpdate(
         { id: code },
         { $set: data }
       );
@@ -42,5 +48,6 @@ async function update(code, data){
 module.exports = {
   getOne,
   create,
-  update
+  update,
+  getOneByCode
 };
