@@ -3,7 +3,7 @@ const pickingAdress = require("./pickingAdress.js");
 const ObjectID = require("mongodb").ObjectId;
 async function getAll(req, res) {
   const data = await requestBus.getAll();
-  return res.json({ errorCode: null, data });
+  return res.json({ errorCode: null, data: data[0].data });
 }
 async function create(req, res) {
   const data = req.body;
