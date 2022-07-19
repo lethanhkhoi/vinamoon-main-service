@@ -35,7 +35,7 @@ async function getOne(code) {
   const result = await database.requestModel().aggregate([...joinAdress(),{
     $match: { id: code},
   }]).toArray();
-  return result;
+  return result[0];
 }
 
 module.exports = {
