@@ -29,10 +29,11 @@ async function create(req, res) {
 }
 async function getOne(req, res) {
   const code = req.params.code;
-  const result = await requestBus.getOne(code);
+  let result = await requestBus.getOne(code);
   if (!result) {
     return res.json({ errorCode: true, data: "Cannot found the request" });
   }
+  result.pickingLocation = result.pickingLocation[0]
   return res.json({ errorCode: null, data: result });
 }
 module.exports = {

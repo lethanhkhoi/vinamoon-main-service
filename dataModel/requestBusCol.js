@@ -10,7 +10,7 @@ function joinAdress(aggregate = []) {
       from: "picking_address",
       localField: "pickingAddress",
       foreignField: "id",
-      as: "location",
+      as: "pickingLocation",
     },
   });
   aggregate.push({
