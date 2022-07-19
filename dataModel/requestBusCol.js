@@ -32,7 +32,9 @@ async function create(data) {
 }
 
 async function getOne(code) {
-  const result = await database.requestModel().findOne({ id: code });
+  const result = await database.requestModel().aggregate([...joinAdress(),{
+    $match: { id: code},
+  }]).toArray();
   return result;
 }
 
