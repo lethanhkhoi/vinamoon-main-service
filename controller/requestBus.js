@@ -2,7 +2,8 @@ const requestBus = require("../dataModel/requestBusCol");
 const pickingAddress = require("./pickingAddress.js");
 const ObjectID = require("mongodb").ObjectId;
 async function getAll(req, res) {
-  const data = await requestBus.getAll();
+  let data = await requestBus.getAll();
+  data[0].data.map(item => item.pickingLocation = item.pickingLocation[0])
   return res.json({ errorCode: null, data: data[0].data });
 }
 async function create(req, res) {
