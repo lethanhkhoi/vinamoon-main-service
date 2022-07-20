@@ -171,7 +171,7 @@ async function userAuthentication(req, res, next) {
       data: "authentication fail",
     });
   }
-  const response = await axios({
+  axios({
     method: "get",
     url: "http://localhost:3002/verify",
     headers: {
