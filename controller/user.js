@@ -163,12 +163,12 @@ const axios = require("axios");
 async function userAuthentication(req, res, next) {
   let token = req.headers["token"];
   console.log(token);
-  console.log("TES");
 
   if (!token) {
+    res.status(401);
     return res.status(401).json({
       errCode: true,
-      data: "authentication fail",
+      data: "authentication fail, no token",
     });
   }
   axios({
@@ -181,6 +181,7 @@ async function userAuthentication(req, res, next) {
   })
     .then((response) => {
       if (response.errCode === true || response.status === 401) {
+        res.status(401);
         return res.json({
           errCode: true,
           data: "authentication fail",
@@ -191,9 +192,10 @@ async function userAuthentication(req, res, next) {
       return next();
     })
     .catch((error) => {
+      res.status(401);
       return res.json({
         errCode: true,
-        data: "authentication fail",
+        data: error,
       });
     });
 }
