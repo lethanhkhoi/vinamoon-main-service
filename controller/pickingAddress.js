@@ -1,7 +1,7 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
 const ObjectID = require("mongodb").ObjectId;
 async function create(data, phone) {
-  let result = await getOne(data);
+  let result = await pickingAddressCol.getOne(data);
   let created = null;
   if (!result) {
     data.lat = null;
