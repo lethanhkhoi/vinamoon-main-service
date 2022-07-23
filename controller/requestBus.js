@@ -26,7 +26,8 @@ async function create(req, res) {
     data.id = ObjectID().toString();
     const pickingAddressResult = await pickingAddress.create(
       data.pickingAddress,
-      user
+      user,
+      data.pickingAddress.pickingId
     );
     if (!pickingAddressResult) {
       return res.json({ errorCode: true, data: "System error" });
