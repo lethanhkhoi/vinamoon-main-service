@@ -54,7 +54,20 @@ async function getOne(req, res) {
     return res.json({ errorCode: true, data: `System error` });
   }
 }
+async function getFrequency(req, res) {
+  try {
+    const phone = req.body.phone;
+    const result = await pickingAddressCol.getFrequency(phone);
+    if (!result) {
+      return res.json({ errorCode: true, data: `Cannot find this address` });
+    }
+    return res.json({ errorCode: null, data: result });
+  } catch (error) {
+    return res.json({ errorCode: true, data: `System error` });
+  }
+}
 module.exports = {
   create,
   getOne,
+  getFrequency
 };
