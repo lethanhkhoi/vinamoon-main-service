@@ -18,7 +18,7 @@ commands =[
         controller:"requestBus",
         method:"post",
         api:"/requestBus",
-        middleware:["authentication"]
+        middleware:[]
     },
 ]
 module.exports= commands

@@ -161,43 +161,46 @@ const axios = require("axios");
 // }
 
 async function userAuthentication(req, res, next) {
-  let token = req.headers["token"];
-  console.log(token);
+  try {
+    let token = req.headers["token"];
 
-  if (!token) {
-    res.status(401);
-    return res.status(401).json({
-      errCode: true,
-      data: "authentication fail, no token",
-    });
-  }
-  axios({
-    method: "get",
-    url: "http://localhost:3002/verify",
-    headers: {
-      "Content-Type": "application/json",
-      token: token,
-    },
-  })
-    .then((response) => {
-      if (response.errCode === true || response.status === 401) {
+    if (!token) {
+      res.status(401);
+      return res.status(401).json({
+        errCode: true,
+        data: "authentication fail, no token",
+      });
+    }
+    axios({
+      method: "get",
+      url: "http://localhost:3002/verify",
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+    })
+      .then((response) => {
+        if (response.errCode === true || response.status === 401) {
+          res.status(401);
+          return res.json({
+            errCode: true,
+            data: "authentication fail",
+          });
+        }
+        const data = response.data.data;
+        req.user = { _id: data._id, phone: data.phone, name: data.name };
+        return next();
+      })
+      .catch((error) => {
         res.status(401);
         return res.json({
           errCode: true,
-          data: "authentication fail",
+          data: error,
         });
-      }
-      const data = response.data.data;
-      req.user = { _id: data._id, phone: data.phone, name: data.name };
-      return next();
-    })
-    .catch((error) => {
-      res.status(401);
-      return res.json({
-        errCode: true,
-        data: error,
       });
-    });
+  } catch (error) {
+    return res.json({ errorCode: true, data: "System error" });
+  }
 }
 module.exports = {
   userAuthentication,
