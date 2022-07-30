@@ -1,10 +1,10 @@
+require("winston-daily-rotate-file");
 const winston = require("winston");
 const { combine, timestamp, json, errors, prettyPrint } = winston.format;
 const { loggerConstant, config } = require("../config/constant");
 
 const { Logtail } = require("@logtail/node");
 const { LogtailTransport } = require("@logtail/winston");
-const moment = require("moment");
 
 const logtail = new Logtail(config.LOG_TOKEN);
 
@@ -29,19 +29,23 @@ const logger = winston.createLogger({
     json()
   ),
   transports: [
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       dirname: loggerConstant.LOG_DIR,
-      filename: loggerConstant.COMBINED_LOG_FILE,
+      filename: "combined-%DATE%.log",
+      datePattern: loggerConstant.DATE_PATTERN,
+      maxFile: loggerConstant.MAX_FILES,
     }),
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       dirname: loggerConstant.LOG_DIR,
-      filename: loggerConstant.HTTP_LOG_FILE,
+      filename: "app-http-%DATE%.log",
       level: "http",
       format: combine(httpFilter(), timestamp(), json()),
     }),
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       dirname: loggerConstant.LOG_DIR,
-      filename: loggerConstant.ERROR_LOG_FILE,
+      filename: "app-error-%DATE%.log",
+      datePattern: loggerConstant.DATE_PATTERN,
+      maxFiles: loggerConstant.MAX_FILES,
       level: "error",
       format: combine(
         errorFilter(),
@@ -50,24 +54,30 @@ const logger = winston.createLogger({
         json()
       ),
     }),
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       dirname: loggerConstant.LOG_DIR,
-      filename: loggerConstant.INFO_LOG_FILE,
+      filename: "app-info-%DATE%.log",
+      datePattern: loggerConstant.DATE_PATTERN,
+      maxFiles: loggerConstant.MAX_FILES,
       level: "info",
       format: combine(infoFilter(), timestamp(), json()),
     }),
     new LogtailTransport(logtail),
   ],
   exceptionHandlers: [
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       dirname: loggerConstant.LOG_DIR,
-      filename: loggerConstant.EXCEPTION_LOG_FILE,
+      datePattern: loggerConstant.DATE_PATTERN,
+      maxFiles: loggerConstant.MAX_FILES,
+      filename: "exceptions-%DATE%.log",
     }),
   ],
   rejectionHandlers: [
-    new winston.transports.File({
+    new winston.transports.DailyRotateFile({
       dirname: loggerConstant.LOG_DIR,
-      filename: loggerConstant.REJECTION_LOG_FILE,
+      datePattern: loggerConstant.DATE_PATTERN,
+      maxFiles: loggerConstant.MAX_FILES,
+      filename: "rejections-%DATE%.log",
     }),
   ],
 });
