@@ -7,6 +7,7 @@ const http = require("http");
 const morganMiddleware = require("./middlewares/morgan");
 const { handleError } = require("./middlewares/errorHandler");
 const logger = require("./logger/winston.js");
+const { config } = require("./config/constant.js");
 
 const app = express();
 
@@ -49,9 +50,9 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3001, function () {
-  logger.info("Server is running", { port: 3001 });
-  console.log("Begin listen on port %s...", 3001);
+server.listen(config.PORT, function () {
+  logger.info("Server is running", { port: config.PORT });
+  console.log("Begin listen on port %s...", config.PORT);
 });
 
 module.exports = app;

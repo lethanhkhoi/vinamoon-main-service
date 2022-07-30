@@ -1,3 +1,0 @@
-{"level":"http","message":"incoming-request","method":"GET","response_time":762.837,"status":304,"timestamp":"2022-07-30T09:09:28.371Z","url":"/requestBus"}
-{"level":"http","message":"incoming-request","method":"GET","response_time":216.569,"status":304,"timestamp":"2022-07-30T09:09:28.619Z","url":"/requestBus"}
-{"content_length":"582","level":"http","message":"incoming-request","method":"GET","response_time":131.501,"status":200,"timestamp":"2022-07-30T09:09:29.720Z","url":"/requestBus/62d1a4da9640aa33eccdda48"}

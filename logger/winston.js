@@ -1,6 +1,12 @@
 const winston = require("winston");
-const { combine, timestamp, json, errors, colorize } = winston.format;
-const { loggerConstant } = require("../config/constant");
+const { combine, timestamp, json, errors, prettyPrint } = winston.format;
+const { loggerConstant, config } = require("../config/constant");
+
+const { Logtail } = require("@logtail/node");
+const { LogtailTransport } = require("@logtail/winston");
+const moment = require("moment");
+
+const logtail = new Logtail(config.LOG_TOKEN);
 
 const errorFilter = winston.format((info, opts) => {
   return info.level === "error" ? info : false;
@@ -16,7 +22,12 @@ const httpFilter = winston.format((info, opts) => {
 
 const logger = winston.createLogger({
   level: "http",
-  format: combine(errors({ stack: true }), timestamp(), json()),
+  format: combine(
+    errors({ stack: true }),
+    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    prettyPrint(),
+    json()
+  ),
   transports: [
     new winston.transports.File({
       dirname: loggerConstant.LOG_DIR,
@@ -45,6 +56,7 @@ const logger = winston.createLogger({
       level: "info",
       format: combine(infoFilter(), timestamp(), json()),
     }),
+    new LogtailTransport(logtail),
   ],
   exceptionHandlers: [
     new winston.transports.File({

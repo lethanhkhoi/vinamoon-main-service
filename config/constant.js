@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const loggerConstant = {
   LOG_DIR: "logs",
   COMBINED_LOG_FILE: "combined.log",
@@ -8,6 +10,12 @@ const loggerConstant = {
   REJECTION_LOG_FILE: "rejections.log",
 };
 
+const config = {
+  PORT: process.env.PORT || 3001,
+  LOG_TOKEN: process.env.LOG_TOKEN,
+};
+
 module.exports = {
   loggerConstant,
+  config,
 };
