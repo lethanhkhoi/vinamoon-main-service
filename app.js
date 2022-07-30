@@ -9,6 +9,7 @@ const config = require("./config/database.json");
 const database = require("./utils/database");
 const { Server } = require("socket.io");
 const http = require("http");
+const morganMiddleware = require("./logger/morgan");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(
     extended: true,
   })
 );
+app.use(morganMiddleware);
 
 database.connectDatabase(() => {
   console.log("connect success");
