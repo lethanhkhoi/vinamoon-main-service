@@ -1,5 +1,6 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
 const ObjectID = require("mongodb").ObjectId;
+
 async function create(data, phone, pickingId) {
   try {
     let result = null;
@@ -42,32 +43,42 @@ async function create(data, phone, pickingId) {
     return null;
   }
 }
-async function getOne(req, res) {
+
+async function getOne(req, res, next) {
   try {
     const code = req.params.code;
     const result = await pickingAddressCol.getOneByCode(code);
     if (!result) {
-      return res.json({ errorCode: true, data: `Cannot find this address` });
+      return res.status(200).send({
+        errorCode: true,
+        exitCode: 1,
+        data: "Cannot find this address",
+      });
     }
     return res.json({ errorCode: null, data: result });
   } catch (error) {
-    return res.json({ errorCode: true, data: `System error` });
+    next(error);
   }
 }
-async function getFrequency(req, res) {
+
+async function getFrequency(req, res, next) {
   try {
     const phone = req.body.phone;
     const result = await pickingAddressCol.getFrequency(phone);
     if (!result) {
-      return res.json({ errorCode: true, data: `Cannot find this address` });
+      return res.status(200).send({
+        errorCode: true,
+        exitCode: 1,
+        data: "Cannot find this address",
+      });
     }
     return res.json({ errorCode: null, data: result });
   } catch (error) {
-    return res.json({ errorCode: true, data: `System error` });
+    next(error);
   }
 }
 module.exports = {
   create,
   getOne,
-  getFrequency
+  getFrequency,
 };

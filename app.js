@@ -1,15 +1,12 @@
-const createError = require("http-errors");
 const express = require("express");
-const fs = require("fs");
 const cors = require("cors");
 const routerCustom = require("./routes/index.js");
-const mongoose = require("mongoose");
-const website = fs.readFileSync("view/index.html");
-const config = require("./config/database.json");
 const database = require("./utils/database");
 const { Server } = require("socket.io");
 const http = require("http");
-const morganMiddleware = require("./logger/morgan");
+const morganMiddleware = require("./middlewares/morgan");
+const { handleError } = require("./middlewares/errorHandler");
+const logger = require("./logger/winston.js");
 
 const app = express();
 
@@ -21,33 +18,12 @@ app.use(
   })
 );
 app.use(morganMiddleware);
-
 database.connectDatabase(() => {
-  console.log("connect success");
+  logger.info("Database connected");
+  console.log("Database connected");
 });
-
 routerCustom.bindRouter(app);
-app.use(express.static("./view"));
-
-app.get("/*", (req, res) => {
-  res.send(website);
-});
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
-});
+app.use(handleError);
 
 const server = http.createServer(app);
 
@@ -59,6 +35,7 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
+  logger.info("User connected ", `${socket.id}`);
   console.log("a user connected", `${socket.id}`);
 
   socket.on("bookCar", (data) => {
@@ -67,11 +44,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    logger.info("User disconnected");
     console.log("user disconnected");
   });
 });
 
 server.listen(3001, function () {
+  logger.info("Server is running", { port: 3001 });
   console.log("Begin listen on port %s...", 3001);
 });
+
 module.exports = app;

@@ -1,0 +1,6 @@
+{"level":"info","message":"Begin listen on port %s...","timestamp":"2022-07-30T09:07:29.939Z"}
+{"level":"info","message":"Database connected","timestamp":"2022-07-30T09:07:31.913Z"}
+{"level":"info","message":"Begin listen","port":3001,"timestamp":"2022-07-30T09:08:59.048Z"}
+{"level":"info","message":"Database connected","timestamp":"2022-07-30T09:09:00.619Z"}
+{"level":"info","message":"Server is running","port":3001,"timestamp":"2022-07-30T09:09:22.028Z"}
+{"level":"info","message":"Database connected","timestamp":"2022-07-30T09:09:23.777Z"}

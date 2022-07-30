@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { ErrorHandler } = require("../middlewares/errorHandler");
 // async function getAll(req, res) {
 //   const data = await userCol.getAll();
 //   return res.json({ errorCode: null, data });
@@ -165,11 +166,7 @@ async function userAuthentication(req, res, next) {
     let token = req.headers["token"];
 
     if (!token) {
-      res.status(401);
-      return res.status(401).json({
-        errCode: true,
-        data: "authentication fail, no token",
-      });
+      throw new ErrorHandler(401, "Authentication fail, don't have token");
     }
     axios({
       method: "get",
@@ -181,25 +178,17 @@ async function userAuthentication(req, res, next) {
     })
       .then((response) => {
         if (response.errCode === true || response.status === 401) {
-          res.status(401);
-          return res.json({
-            errCode: true,
-            data: "authentication fail",
-          });
+          throw new ErrorHandler(401, "Authentication fail");
         }
         const data = response.data.data;
         req.user = { _id: data._id, phone: data.phone, name: data.name };
         return next();
       })
       .catch((error) => {
-        res.status(401);
-        return res.json({
-          errCode: true,
-          data: error,
-        });
+        throw new ErrorHandler(401, error.message);
       });
   } catch (error) {
-    return res.json({ errorCode: true, data: "System error" });
+    throw new ErrorHandler(401, error.message);
   }
 }
 module.exports = {
