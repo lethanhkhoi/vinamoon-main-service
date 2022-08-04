@@ -6,6 +6,7 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.16",
     "@logtail/node": "^0.1.12",
     "@logtail/winston": "^0.1.12",
     "axios": "^0.27.2",
