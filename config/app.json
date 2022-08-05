@@ -1,4 +1,6 @@
 {
     "tokenKey": "CALLCENTER",
-    "refreshTokenKey": "REFRESH"
+    "refreshTokenKey": "REFRESH",
+    "accountsId" : "AC40ef3178e0613bbcd22f9e80a97c3aaa",
+    "smsToken": "10ff0db0de12081dcee9ed7f84d824b9"
 }
