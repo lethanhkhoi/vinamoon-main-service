@@ -37,16 +37,14 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   logger.info("User connected ", `${socket.id}`);
-  console.log("a user connected", `${socket.id}`);
-
   socket.on("bookCar", (data) => {
     console.log(data);
-    io.emit("bookCar", data);
+    io.emit(data.phone, "From server");
   });
 
   socket.on("disconnect", () => {
-    logger.info("User disconnected");
-    console.log("user disconnected");
+    logger.info("User disconnected ", `${socket.id}`);
+    console.log("User disconnected");
   });
 });
 
