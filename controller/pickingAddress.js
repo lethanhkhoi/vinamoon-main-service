@@ -1,44 +1,19 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
 const ObjectID = require("mongodb").ObjectId;
 
-async function create(data, phone, pickingId) {
+async function create(data, phone) {
   try {
-    let result = null;
-    if (data.pickingId) {
-      result = await pickingAddressCol.getOneByCode(pickingId);
-    }
-    let created = null;
-    if (!result) {
-      data.lat = null;
-      data.long = null;
-      data.id = ObjectID().toString();
-      data.requests = [
-        {
-          phone,
-          count: 1,
-        },
-      ];
-      await pickingAddressCol.create(data);
-      created = data;
-    } else {
-      let requests = result.requests;
-      const requestPhone = requests.map((item) => item.phone);
-      for (let i = 0; i < requests.length; i++) {
-        if (requests[i].phone === phone) {
-          requests[i].count += 1;
-        }
-      }
-      if (!requestPhone.includes(phone)) {
-        requests.push({
-          phone,
-          count: 1,
-        });
-      }
-      result.requests = requests;
-      const update = await pickingAddressCol.update(result.id, result);
-      created = update.value;
-    }
-    return created;
+    data.lat = null;
+    data.long = null;
+    data.id = ObjectID().toString();
+    data.requests = [
+      {
+        phone,
+        count: 1,
+      },
+    ];
+    await pickingAddressCol.create(data);
+    return data;
   } catch (error) {
     return null;
   }
