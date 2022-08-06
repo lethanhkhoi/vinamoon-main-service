@@ -38,28 +38,31 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  logger.info("User connected ", `${socket.id}`);
-  console.log("a user connected", `${socket.id}`);
+  logger.info(`User connected. SocketId: ${socket.id}`, {
+    socketId: socket.id,
+  });
+  socket.on("bookCar", (request) => {
+    try {
+      io.emit(request.roomId, "From server");
+      logger.info(`Broadcast request from user ${socket.id}`, {
+        request: request,
+      });
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
 
   socket.on("location", (data) => {
     console.log(data);
     io.emit("bookCar", data);
   });
 
-  socket.on("bookCar", (data) => {
-    console.log(data);
-    io.emit("bookCar", data);
-
-    if (data?.roomId) {
-      socket.on(data.roomId, (data) => {
-        console.log(data);
-      });
-    }
-  });
-
   socket.on("disconnect", () => {
-    logger.info("User disconnected");
-    console.log("user disconnected");
+    logger.info(`User disconnected. SocketId: ${socket.id}`, {
+      socketId: socket.id,
+    });
+    console.log("User disconnected");
   });
 });
 
