@@ -8,8 +8,10 @@ const morganMiddleware = require("./middlewares/morgan");
 const { handleError } = require("./middlewares/errorHandler");
 const logger = require("./logger/winston.js");
 const { config } = require("./config/constant.js");
-
 const app = express();
+
+// const getAddress = require("./utils/googleAPI");
+// getAddress(10.762836, 106.682482);
 
 app.use(cors());
 app.use(express.json());
@@ -37,9 +39,14 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   logger.info("User connected ", `${socket.id}`);
-  socket.on("bookCar", (data) => {
+  socket.on("bookCar", (request) => {
+    console.log(request);
+    io.emit(request.roomId, "From server");
+  });
+
+  socket.on("location", (data) => {
     console.log(data);
-    io.emit(data.phone, "From server");
+    io.emit("bookCar", data);
   });
 
   socket.on("disconnect", () => {
