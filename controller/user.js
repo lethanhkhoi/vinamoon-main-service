@@ -177,18 +177,22 @@ async function userAuthentication(req, res, next) {
       },
     })
       .then((response) => {
-        if (response.errCode === true || response.status === 401) {
-          throw new ErrorHandler(401, "Authentication fail");
+        if (response.data.errorCode === true || response.status === 401) {
+          // throw new ErrorHandler(401, "Authentication fail");
+          return res.json({ errorCode: true, data: "Authen fail" });
         }
+        console.log(response.data)
         const data = response.data.data;
         req.user = { _id: data._id, phone: data.phone, name: data.name };
         return next();
       })
       .catch((error) => {
-        throw new ErrorHandler(401, error.message);
+        // throw new ErrorHandler(401, error.message);
+        return res.json({ errorCode: true, data: "Authen fail" });
       });
   } catch (error) {
-    throw new ErrorHandler(401, error.message);
+    // throw new ErrorHandler(401, error.message);
+    return res.json({ errorCode: true, data: "Authen fail" });
   }
 }
 module.exports = {
