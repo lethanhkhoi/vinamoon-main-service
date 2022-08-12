@@ -7,11 +7,20 @@ async function getAll() {
     const sort = {
       role: -1,
     };
-    return await database
+    let users = await database
       .userModel()
       .aggregate([{ $sort: sort }])
       .toArray();
+
+    users.forEach((element) => {
+      console.log(element);
+      delete element.refreshToken;
+      delete element.password;
+    });
+
+    return users;
   } catch (error) {
+    console.log(error);
     return null;
   }
 }

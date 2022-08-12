@@ -38,11 +38,11 @@ const ObjectID = require("mongodb").ObjectId;
 
 async function getAll(req, res, next) {
   try {
-    const result = await user.getAll();
-    if (!result) {
+    let users = await user.getAll();
+    if (!users) {
       throw new ErrorHandler(204, "Cannot get all users");
     }
-    return res.json({ errorCode: null, data: result });
+    return res.json({ errorCode: null, users });
   } catch (error) {
     next(error);
   }
