@@ -11,7 +11,7 @@ commands = [
     controller: "user",
     method: "get",
     api: "/users",
-    middleware: [],
+    middleware: ["authentication"],
   },
 ];
 module.exports = commands;

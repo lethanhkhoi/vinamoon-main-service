@@ -1,4 +1,3 @@
-const { NetworkContext } = require("twilio/lib/rest/supersim/v1/network");
 const user = require("../dataModel/userCol");
 const ObjectID = require("mongodb").ObjectId;
 
