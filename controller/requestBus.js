@@ -44,7 +44,7 @@ async function createFromWeb(req, res, next) {
       });
     }
     data.pickingAddress = pickingAddressResult.id;
-    const result = await requestBus.create(data);
+    const result = await requestBusCol.create(data);
     if (!result) {
       return res.status(200).send({
         errorCode: true,
@@ -60,7 +60,7 @@ async function createFromWeb(req, res, next) {
 async function getOne(req, res, next) {
   try {
     const code = req.params.code;
-    let result = await requestBus.getOne(code);
+    let result = await requestBusCol.getOne(code);
     if (!result) {
       return res.status(200).send({
         errorCode: true,
@@ -131,11 +131,14 @@ async function create(req, res) {
           long: req.body.destination.long,
         },
       };
-      const create = await requestBusCol.create(data)
-      if(!create){
-        return res.json({errorCode: true, data: "Cannot create booking request"})
+      const create = await requestBusCol.create(data);
+      if (!create) {
+        return res.json({
+          errorCode: true,
+          data: "Cannot create booking request",
+        });
       }
-      return res.json({errorCode: null, data: create})
+      return res.json({ errorCode: null, data: create });
     }
   } catch (error) {
     return res.json({ errorCode: true, data: "System error" });
