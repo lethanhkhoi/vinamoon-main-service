@@ -1,4 +1,5 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
+const { ErrorHandler } = require("../middlewares/errorHandler");
 const ObjectID = require("mongodb").ObjectId;
 async function create(data, phone) {
   try {
@@ -23,11 +24,7 @@ async function getOne(req, res, next) {
     const code = req.params.code;
     const result = await pickingAddressCol.getOneByCode(code);
     if (!result) {
-      return res.status(200).send({
-        errorCode: true,
-        exitCode: 1,
-        data: "Cannot find this address",
-      });
+      throw new ErrorHandler(204, "Cannot find this address");
     }
     return res.json({ errorCode: null, data: result });
   } catch (error) {
@@ -40,11 +37,7 @@ async function getFrequency(req, res, next) {
     const phone = req.body.phone;
     const result = await pickingAddressCol.getFrequency(phone);
     if (!result) {
-      return res.status(200).send({
-        errorCode: true,
-        exitCode: 1,
-        data: "Cannot find this address",
-      });
+      throw new ErrorHandler(204, "Cannot find this frequency address");
     }
     return res.json({ errorCode: null, data: result });
   } catch (error) {
@@ -56,11 +49,7 @@ async function getAll(req, res) {
   try {
     const result = await pickingAddressCol.getAll();
     if (!result) {
-      return res.json({
-        errorCode: true,
-        exitCode: 1,
-        data: "Cannot find this address",
-      });
+      throw new ErrorHandler(204, "Cannot get all addresses");
     }
     return res.json({ errorCode: null, data: result });
   } catch (error) {
@@ -76,5 +65,5 @@ module.exports = {
   create,
   getOne,
   getFrequency,
-  getAll
+  getAll,
 };
