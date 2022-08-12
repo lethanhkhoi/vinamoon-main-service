@@ -7,6 +7,13 @@ commands = [
     middleware: [],
   },
   {
+    name: "getAll",
+    controller: "pickingAddress",
+    method: "get",
+    api: "/address",
+    middleware: [],
+  },
+  {
     name: "getFrequency",
     controller: "pickingAddress",
     method: "post",

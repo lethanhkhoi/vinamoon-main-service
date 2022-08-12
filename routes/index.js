@@ -1,13 +1,14 @@
 const userCommand = require("./user.js");
 const requestBusCommand = require("./requestBus.js");
 const pickingAddressCommand = require("./pickingAddress.js");
-
+const vehicleCommand = require("./vehicle.js");
 const smsCommand = require("./sms.js");
 
 const event = [
   userCommand,
   requestBusCommand,
   pickingAddressCommand,
+  vehicleCommand,
   smsCommand,
 ];
 const controllers = {
@@ -15,6 +16,7 @@ const controllers = {
   requestBus: require("../controller/requestBus.js"),
   pickingAddress: require("../controller/pickingAddress.js"),
   sms: require("../controller/sms.js"),
+  vehicle: require("../controller/vehicle")
 };
 
 const middlewares = {

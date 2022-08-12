@@ -1,10 +1,12 @@
-const requestBus = require("../dataModel/requestBusCol");
+const requestBusCol = require("../dataModel/requestBusCol");
 const pickingAddress = require("./pickingAddress.js");
+const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
+const { getDistance } = require("../utils/getDistance");
 const ObjectID = require("mongodb").ObjectId;
 
 async function getAll(req, res, next) {
   try {
-    let data = await requestBus.getAll();
+    let data = await requestBusCol.getAll();
     data[0].data.map(
       (item) => (item.pickingLocation = item.pickingLocation[0])
     );
@@ -13,11 +15,11 @@ async function getAll(req, res, next) {
     next(error);
   }
 }
-async function create(req, res, next) {
+async function createFromWeb(req, res, next) {
   try {
     const data = req.body;
     const user = req.body.phone ?? req.user.phone;
-    for (property in requestBus.validateRequest) {
+    for (property in requestBusCol.validateRequest) {
       if (data[property] === null) {
         return res.status(200).send({
           errorCode: true,
@@ -72,8 +74,76 @@ async function getOne(req, res, next) {
     next(err);
   }
 }
+async function create(req, res) {
+  try {
+    const location = await pickingAddressCol.getAll();
+    const user = req.user;
+    for (property in requestBusCol.validateRequest) {
+      if (data[property] === null) {
+        return res.status(200).send({
+          errorCode: true,
+          exitCode: 1,
+          data: "Missing property",
+        });
+      }
+    }
+    if (!req.body.origin || !req.body.destination) {
+      return res.json({ errorCode: true, data: "Please input long and lat" });
+    }
+    const newLocationArray = location.filter((item) => item.long && item.lat);
+    let distanceArray = [];
+    newLocationArray.map((item, index) => {
+      const distance = getDistance(
+        { lat1: item.lat, lon1: item.long },
+        { lat2: req.body.origin.lat, lon2: req.body.origin.long }
+      );
+      distanceArray.push(distance);
+    });
+    const min = Math.min(...distanceArray);
+    const minIndex = distanceArray.indexOf(min);
+    let pickingLocation = newLocationArray[minIndex];
+    pickingLocation.requests.map((item) => {
+      if (item.phone === user.phone) {
+        pickingLocation.requests.map((item) => {
+          if (item.phone === user.phone) {
+            item.count++;
+          }
+        });
+      }
+    });
+    const updated = await pickingAddressCol.update(
+      pickingLocation.id,
+      pickingLocation
+    );
+    if (!updated) {
+      return res.json({ errorCode: true, data: "system error" });
+    }
+    if (req.body.device === "mobile") {
+      const data = {
+        id: ObjectID().toString(),
+        phone: user.phone,
+        name: req.body.name ?? req.user.name,
+        vehicleId: req.body.vehicleId,
+        pickingAddress: pickingLocation.id,
+        status: "Pending",
+        destination: {
+          lat: req.body.destination.lat,
+          long: req.body.destination.long,
+        },
+      };
+      const create = await requestBusCol.create(data)
+      if(!create){
+        return res.json({errorCode: true, data: "Cannot create booking request"})
+      }
+      return res.json({errorCode: null, data: create})
+    }
+  } catch (error) {
+    return res.json({ errorCode: true, data: "System error" });
+  }
+}
 module.exports = {
   getAll,
-  create,
+  createFromWeb,
   getOne,
+  create,
 };

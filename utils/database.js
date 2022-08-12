@@ -1,35 +1,37 @@
 const { MongoClient } = require("mongodb");
-const config = require('../config/database.json');
+const config = require("../config/database.json");
 
-let _userModel =null
-let _requestModel =null
-let _pickingAddressModel =null
+let _userModel = null;
+let _requestModel = null;
+let _pickingAddressModel = null;
+let _vehicleModel = null;
 async function connectDatabase(cb) {
-    const client = new MongoClient(config.uri);
-    try {
-      await client.connect();
-      let db = await client.db('bus');
-      console.log("connect to DB Success", config.uri);
-  
-      // Authentication
-      _userModel = db.collection("user");
-      _requestModel = db.collection("request");
-      _pickingAddressModel = db.collection("picking_address")
-      dbClient = client;
-  
-      cb();
-    } catch (e) {
-      console.error(e);
-    }
+  const client = new MongoClient(config.uri);
+  try {
+    await client.connect();
+    let db = await client.db("bus");
+    console.log("connect to DB Success", config.uri);
+
+    // Authentication
+    _userModel = db.collection("user");
+    _requestModel = db.collection("request");
+    _pickingAddressModel = db.collection("picking_address");
+    _vehicleModel = db.collection("vehicle");
+    dbClient = client;
+
+    cb();
+  } catch (e) {
+    console.error(e);
+  }
 }
 // Authentication
 
 const userModel = function () {
-    if (_userModel == null) {
-      console.log("Instance is null or undefined");
-    } else {
-      return _userModel;
-    }
+  if (_userModel == null) {
+    console.log("Instance is null or undefined");
+  } else {
+    return _userModel;
+  }
 };
 
 const requestModel = function () {
@@ -48,9 +50,18 @@ const pickingAddressModel = function () {
   }
 };
 
-module.exports ={
-    userModel,
-    requestModel,
-    pickingAddressModel,
-    connectDatabase
-}
+const vehicleModel = function () {
+  if (_vehicleModel == null) {
+    console.log("Instance is null or undefined");
+  } else {
+    return _vehicleModel;
+  }
+};
+
+module.exports = {
+  userModel,
+  requestModel,
+  pickingAddressModel,
+  connectDatabase,
+  vehicleModel
+};

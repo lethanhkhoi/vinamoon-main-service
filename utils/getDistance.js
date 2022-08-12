@@ -1,6 +1,7 @@
+
 const getDistance = (coordinate1, coordinate2) => {
-  const { lat1, lon1 } = coordinate1;
-  const { lat2, lon2 } = coordinate2;
+  let { lat1, lon1 } = coordinate1;
+  let { lat2, lon2 } = coordinate2;
   lon1 = (lon1 * Math.PI) / 180;
   lon2 = (lon2 * Math.PI) / 180;
   lat1 = (lat1 * Math.PI) / 180;

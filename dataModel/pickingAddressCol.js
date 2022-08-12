@@ -51,9 +51,17 @@ async function update(code, data) {
     return null;
   }
 }
+async function getAll(){
+  try{
+    return await database.pickingAddressModel().find().toArray()
+  }catch(error){
+    return null
+  }
+}
 module.exports = {
   create,
   update,
   getOneByCode,
   getFrequency,
+  getAll
 };

@@ -14,11 +14,18 @@ commands =[
         middleware:["authentication"]
     },
     {
-        name:"create",
+        name:"createFromWeb",
         controller:"requestBus",
         method:"post",
         api:"/requestBus",
         middleware:[]
+    },
+    {
+        name:"create",
+        controller:"requestBus",
+        method:"post",
+        api:"/createRequest",
+        middleware:["authentication"]
     },
 ]
 module.exports= commands

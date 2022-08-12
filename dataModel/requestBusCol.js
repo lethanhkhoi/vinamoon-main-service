@@ -2,7 +2,7 @@ const { dataPagination } = require("../helperFunction/helper");
 const ObjectID = require("mongodb").ObjectId;
 const database = require("../utils/database");
 
-const validateRequest = ["phone", "name", "pickingAddress", "seat"];
+const validateRequest = ["phone", "name", "pickingAddress", "vehicleId"];
 function joinAdress(aggregate = []) {
   aggregate.push({
     $lookup: {

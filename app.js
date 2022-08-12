@@ -2,12 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const routerCustom = require("./routes/index.js");
 const database = require("./utils/database");
-const { Server } = require("socket.io");
 const http = require("http");
 const morganMiddleware = require("./middlewares/morgan");
 const { handleError } = require("./middlewares/errorHandler");
 const logger = require("./logger/winston.js");
 const { config } = require("./config/constant.js");
+const {createSocket} = require("./socket/socket.js")
 const app = express();
 
 // const getAddress = require("./utils/googleAPI");
@@ -30,41 +30,7 @@ app.use(handleError);
 
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: "GET,POST,PUT, PATCH, DELETE",
-  },
-});
-
-io.on("connection", (socket) => {
-  logger.info(`User connected. SocketId: ${socket.id}`, {
-    socketId: socket.id,
-  });
-  socket.on("bookCar", (request) => {
-    try {
-      io.emit(request.roomId, "From server");
-      logger.info(`Broadcast request from user ${socket.id}`, {
-        request: request,
-      });
-    } catch (error) {
-      logger.error(error);
-      next(error);
-    }
-  });
-
-  socket.on("location", (data) => {
-    console.log(data);
-    io.emit("bookCar", data);
-  });
-
-  socket.on("disconnect", () => {
-    logger.info(`User disconnected. SocketId: ${socket.id}`, {
-      socketId: socket.id,
-    });
-    console.log("User disconnected");
-  });
-});
+createSocket(server)
 
 server.listen(config.PORT, function () {
   logger.info("Server is running", { port: config.PORT });
