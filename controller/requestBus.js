@@ -71,6 +71,7 @@ async function getOne(req, res, next) {
       });
     }
     result.pickingLocation = result.pickingLocation[0];
+    result.vehicleType = result.vehicleType[0];
     return res.json({ errorCode: null, data: result });
   } catch (err) {
     next(err);

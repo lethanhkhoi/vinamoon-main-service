@@ -24,16 +24,12 @@ async function update(req, res) {
   } catch (error) {}
 }
 
-async function getAll(req, res) {
+async function getAll(req, res, next) {
   try {
     const vehicles = await vehicleCol.getAll();
     return res.json({ errorCode: null, data: vehicles });
   } catch (error) {
-    return res.json({
-      errorCode: true,
-      exitCode: 1,
-      data: "system error",
-    });
+    next(error);
   }
 }
 
