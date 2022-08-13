@@ -10,13 +10,12 @@ async function connectDatabase(cb) {
   try {
     await client.connect();
     let db = await client.db("bus");
-    console.log("connect to DB Success", config.uri);
 
     // Authentication
     _userModel = db.collection("user");
     _requestModel = db.collection("request");
     _pickingAddressModel = db.collection("picking_address");
-    _vehicleModel = db.collection("vehicle");
+    _vehicleModel = db.collection("vehicle_type");
     dbClient = client;
 
     cb();
@@ -63,5 +62,5 @@ module.exports = {
   requestModel,
   pickingAddressModel,
   connectDatabase,
-  vehicleModel
+  vehicleModel,
 };

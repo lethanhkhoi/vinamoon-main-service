@@ -1,31 +1,31 @@
-commands =[
-    {
-        name:"getAll",
-        controller:"requestBus",
-        method:"get",
-        api:"/requestBus",
-        middleware:["authentication"]
-    },
-    {
-        name:"getOne",
-        controller:"requestBus",
-        method:"get",
-        api:"/requestBus/:code",
-        middleware:["authentication"]
-    },
-    {
-        name:"createFromWeb",
-        controller:"requestBus",
-        method:"post",
-        api:"/requestBus",
-        middleware:[]
-    },
-    {
-        name:"create",
-        controller:"requestBus",
-        method:"post",
-        api:"/createRequest",
-        middleware:["authentication"]
-    },
-]
-module.exports= commands
+commands = [
+  {
+    name: "getAll",
+    controller: "requestBus",
+    method: "get",
+    api: "/requestBus",
+    middleware: ["authentication"],
+  },
+  {
+    name: "getOne",
+    controller: "requestBus",
+    method: "get",
+    api: "/requestBus/:code",
+    middleware: ["authentication"],
+  },
+  {
+    name: "createFromWeb",
+    controller: "requestBus",
+    method: "post",
+    api: "/requestBus",
+    middleware: [],
+  },
+  {
+    name: "create",
+    controller: "requestBus",
+    method: "post",
+    api: "/createRequest",
+    middleware: ["authentication"],
+  },
+];
+module.exports = commands;

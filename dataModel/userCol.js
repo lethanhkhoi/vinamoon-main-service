@@ -13,9 +13,9 @@ async function getAll() {
       .toArray();
 
     users.forEach((element) => {
-      console.log(element);
       delete element.refreshToken;
       delete element.password;
+      console.log(element);
     });
 
     return users;
