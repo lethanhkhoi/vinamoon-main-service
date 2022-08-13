@@ -5,7 +5,7 @@ const database = require("../utils/database");
 async function getAll() {
   try {
     const sort = {
-      role: -1,
+      role: 1,
     };
     let users = await database
       .userModel()

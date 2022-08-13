@@ -10,7 +10,6 @@ function dataPagination(match, sort, page = 1, limit = 10, join = false) {
   if (join) {
     join.forEach((item) => data.push(item));
   }
-
   aggregate.push({ $facet: { data } });
   return aggregate;
 }

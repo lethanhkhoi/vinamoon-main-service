@@ -1,11 +1,10 @@
 const database = require("../utils/database");
 
 function joinAddress(phone, aggregate = []) {
-  console.log('tesst')
   aggregate.push(
-    {$match: {'requests.phone': phone}},
-    {$sort: {'requests.count': -1} },
-    {$limit: 5}
+    { $match: { "requests.phone": phone } },
+    { $sort: { "requests.count": -1 } },
+    { $limit: 5 }
   );
   return aggregate;
 }
@@ -51,11 +50,11 @@ async function update(code, data) {
     return null;
   }
 }
-async function getAll(){
-  try{
-    return await database.pickingAddressModel().find().toArray()
-  }catch(error){
-    return null
+async function getAll() {
+  try {
+    return await database.pickingAddressModel().find().toArray();
+  } catch (error) {
+    return null;
   }
 }
 module.exports = {
@@ -63,5 +62,5 @@ module.exports = {
   update,
   getOneByCode,
   getFrequency,
-  getAll
+  getAll,
 };
