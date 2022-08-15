@@ -1,7 +1,6 @@
 const database = require("../utils/database");
-const ObjectID = require("mongodb").ObjectId;
-const vehicleProperties = ["seat", "unitPrice"];
-const creatValidation = ["unitPrice", "seat"];
+const vehicleProperties = ["name", "seat", "unitPrice"];
+const creatValidation = ["name", "unitPrice", "seat"];
 async function getAll() {
   return await database.vehicleModel().find().toArray();
 }

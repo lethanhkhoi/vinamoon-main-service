@@ -10,7 +10,6 @@ const logger = require("../logger/winston");
 
 const handleError = (err, req, res, next) => {
   const { statusCode, message } = err;
-  console.log("error");
   logger.error(err);
 
   res.status(statusCode || 500).send({

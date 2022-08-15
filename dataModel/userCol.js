@@ -5,7 +5,7 @@ const database = require("../utils/database");
 async function getAll() {
   try {
     const sort = {
-      role: -1,
+      role: 1,
     };
     let users = await database
       .userModel()
@@ -13,9 +13,9 @@ async function getAll() {
       .toArray();
 
     users.forEach((element) => {
-      console.log(element);
       delete element.refreshToken;
       delete element.password;
+      console.log(element);
     });
 
     return users;

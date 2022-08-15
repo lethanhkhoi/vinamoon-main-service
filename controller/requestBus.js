@@ -9,10 +9,12 @@ const ObjectID = require("mongodb").ObjectId;
 async function getAll(req, res, next) {
   try {
     let data = await requestBusCol.getAll();
-    data[0].data.map(
-      (item) => (item.pickingLocation = item.pickingLocation[0])
-    );
-    return res.json({ errorCode: null, data: data[0].data });
+    const result = data[0].data.map((item) => ({
+      ...item,
+      pickingLocation: item.pickingLocation[0],
+      vehicleType: item.vehicleType[0],
+    }));
+    return res.json({ errorCode: null, data: result });
   } catch (error) {
     next(error);
   }
@@ -63,6 +65,7 @@ async function getOne(req, res, next) {
       });
     }
     result.pickingLocation = result.pickingLocation[0];
+    result.vehicleType = result.vehicleType[0];
     return res.json({ errorCode: null, data: result });
   } catch (err) {
     next(err);
