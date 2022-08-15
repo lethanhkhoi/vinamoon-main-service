@@ -7,7 +7,7 @@ async function getAll() {
 }
 async function create(data) {
   data["createdAt"] = new Date();
-  return await database.vehicleModel().insertOne(data);
+  return await database.vehicleModel().insertOne(data).ops[0];
 }
 
 async function update(code, data) {
