@@ -1,6 +1,4 @@
 const ObjectID = require("mongodb").ObjectId;
-const { VehicleType } = require("@googlemaps/google-maps-services-js");
-const logger = require("../logger/winston");
 const database = require("../utils/database");
 
 // const validateRequest = ["phone", "name", "pickingAddress", "vehicleId"];
@@ -11,15 +9,32 @@ async function getAll() {
     };
     let users = await database
       .userModel()
-      .aggregate([{ $sort: sort }])
+      .aggregate([
+        { $sort: sort },
+        {
+          $lookup: {
+            from: "vehicle_type",
+            localField: "vehicle.typeId",
+            foreignField: "id",
+            as: "vehicleData",
+          },
+        },
+      ])
       .toArray();
 
     users.forEach((element) => {
       delete element.refreshToken;
       delete element.password;
-      console.log(element);
+      if (element?.vehicleData[0]?.name) {
+        element.vehicle = {
+          ...element.vehicle,
+          name: element.vehicleData[0].name,
+        };
+      }
+      delete element.vehicleData;
     });
 
+    console.log(users);
     return users;
   } catch (error) {
     return null;
