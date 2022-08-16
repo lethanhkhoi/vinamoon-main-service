@@ -9,6 +9,7 @@ const loggerConstant = {
 const config = {
   PORT: process.env.PORT || 3001,
   LOG_TOKEN: process.env.LOG_TOKEN,
+  DEFAULT_PASSWORD: process.env.DEFAULT_PASSWORD,
 };
 
 module.exports = {

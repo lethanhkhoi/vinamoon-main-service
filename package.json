@@ -11,6 +11,7 @@
     "@logtail/winston": "^0.1.12",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
@@ -29,8 +30,8 @@
     "nodemon": "^2.0.18",
     "redis": "^4.2.0",
     "socket.io": "^4.5.1",
+    "twilio": "^3.80.0",
     "winston": "^3.8.1",
-    "winston-daily-rotate-file": "^4.7.1",
-    "twilio": "^3.80.0"
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }

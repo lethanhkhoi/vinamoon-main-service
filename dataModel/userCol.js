@@ -1,5 +1,8 @@
 const ObjectID = require("mongodb").ObjectId;
 const database = require("../utils/database");
+const { config } = require("../config/constant");
+var bcrypt = require("bcryptjs");
+var salt = bcrypt.genSaltSync(10);
 
 // const validateRequest = ["phone", "name", "pickingAddress", "vehicleId"];
 async function getAll() {
@@ -67,6 +70,16 @@ async function update(_user) {
 
 async function create(_user) {
   try {
+    var hashPassword = bcrypt.hashSync(
+      _user.password || config.DEFAULT_PASSWORD,
+      salt
+    );
+
+    _user = {
+      ..._user,
+      password: hashPassword,
+    };
+
     const result = await database.userModel().insertOne(_user);
     return result;
   } catch (error) {
