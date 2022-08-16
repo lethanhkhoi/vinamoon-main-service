@@ -1,7 +1,7 @@
 const { dataPagination } = require("../helperFunction/helper");
 const database = require("../utils/database");
 
-const validateRequest = ["phone", "name", "pickingAddress", "vehicleTypeId"];
+const validateRequest = ["name", "vehicleId"];
 function joinAddress(aggregate = []) {
   aggregate.push({
     $lookup: {
@@ -39,8 +39,9 @@ async function getAll() {
 }
 async function create(data) {
   try {
+    data["createdAt"] = new Date()
     const result = await database.requestModel().insertOne(data);
-    return result;
+    return result.ops[0];
   } catch (error) {
     return null;
   }
