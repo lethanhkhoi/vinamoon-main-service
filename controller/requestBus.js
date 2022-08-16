@@ -83,7 +83,7 @@ async function create(req, res) {
         });
       }
     }
-    if (!req.body.origin || !req.body.destination) {
+    if (!req.body.origin) {
       return res.json({ errorCode: true, data: "Please input long and lat" });
     }
     const newLocationArray = location.filter((item) => item.long && item.lat);
@@ -168,8 +168,8 @@ async function create(req, res) {
       pickingAddress: pickingLocation.id,
       status: "Pending",
       destination: {
-        lat: req.body.destination.lat,
-        long: req.body.destination.long,
+        lat: req.body.destination.lat ?? null,
+        long: req.body.destination.long ?? null,
       },
     };
 
