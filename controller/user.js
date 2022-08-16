@@ -48,8 +48,27 @@ async function getAll(req, res, next) {
   }
 }
 
+async function update(req, res, next) {
+  try {
+    // let users = await user.getAll();
+    // if (!users) {
+    //   throw new ErrorHandler(204, "Cannot get all users");
+    // }
+    // return res.json({ errorCode: null, users });
+    const _user = req.body;
+    const result = await user.update(_user);
+    if (!result) {
+      throw new ErrorHandler(204, "Cannot update user");
+    }
+    // console.log(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   //   create,
   //   getOne,
   getAll,
+  update,
 };
