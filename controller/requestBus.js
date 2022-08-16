@@ -36,9 +36,8 @@ async function createFromWeb(req, res, next) {
     data.status = "Pending";
     data.id = ObjectID().toString();
     const pickingAddressResult = await pickingAddress.create(
-      data.pickingAddress,
+      data,
       user,
-      data.pickingAddress.pickingId
     );
     if (!pickingAddressResult) {
       return res.status(200).send({
@@ -76,7 +75,7 @@ async function create(req, res) {
     const data = req.body;
     const location = await pickingAddressCol.getAll();
     const user = req.user;
-    for (property in requestBusCol.validateRequest) {
+    for (property of requestBusCol.validateRequest) {
       if (data[property] === null) {
         return res.json({
           errorCode: true,
@@ -132,17 +131,6 @@ async function create(req, res) {
         pickingLocation = await pickingAddressCol.getOneByCode(req.body.pickingAddressId)
         pickingLocation.lat = req.body.origin.lat
         pickingLocation.long = req.body.origin.long
-        const tempArray1 = pickingLocation.requests.filter(item => item.phone !== user.phone)
-        let tempArray2 = pickingLocation.requests.filter(item => item.phone === user.phone)
-        if(tempArray2.length > 0){
-          tempArray2[0].count = tempArray2[0].count + 1
-        }else{
-          tempArray2.push({
-            phone: user.phone,
-            count: 1
-          })
-        }
-        pickingLocation.requests = [...tempArray1, ...tempArray2]
         const resultUpdate = await pickingAddressCol.update(req.body.pickingAddressId, pickingLocation)
         if (!resultUpdate) {
           return res.json({
@@ -192,7 +180,7 @@ async function create(req, res) {
         data: "Cannot create booking request",
       });
     }
-    return res.json({ errorCode: null, data: create });
+    return res.json({ errorCode: null, data: requestBustData });
   } catch (error) {
     return res.json({ errorCode: true, data: "System error" });
   }
