@@ -9,50 +9,65 @@ async function getAll() {
     };
     let users = await database
       .userModel()
-      .aggregate([{ $sort: sort }])
+      .aggregate([
+        { $sort: sort },
+        {
+          $lookup: {
+            from: "vehicle_type",
+            localField: "vehicle.typeId",
+            foreignField: "id",
+            as: "vehicleData",
+          },
+        },
+      ])
       .toArray();
 
     users.forEach((element) => {
       delete element.refreshToken;
       delete element.password;
-      console.log(element);
+      if (element?.vehicleData[0]?.name) {
+        element.vehicle = {
+          ...element.vehicle,
+          name: element.vehicleData[0].name,
+        };
+      }
+      delete element.vehicleData;
     });
 
+    console.log(users);
     return users;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function update(_user) {
+  try {
+    const _id = _user._id;
+    delete _user._id;
+    if (_user.role !== "driver") {
+      _user = {
+        ..._user,
+        vehicle: null,
+      };
+    }
+    const result = await database
+      .userModel()
+      .findOneAndUpdate(
+        { _id: new ObjectID(_id) },
+        { $set: _user },
+        { upsert: true }
+      );
+    return result;
   } catch (error) {
     console.log(error);
     return null;
   }
 }
 
-// async function create(data) {
-//   try {
-//     const result = await database.requestModel().insertOne(data);
-//     return result;
-//   } catch (error) {
-//     return null;
-//   }
-// }
-
-// async function getOne(code) {
-//   try {
-//     const result = await database
-//       .requestModel()
-//       .aggregate([
-//         ...joinAdress(),
-//         {
-//           $match: { id: code },
-//         },
-//       ])
-//       .toArray();
-//     return result[0];
-//   } catch (error) {
-//     return null;
-//   }
-// }
-
 module.exports = {
   getAll,
+  update,
   //   create,
   //   getOne,
 };

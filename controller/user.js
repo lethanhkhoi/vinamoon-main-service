@@ -1,5 +1,4 @@
 const user = require("../dataModel/userCol");
-const ObjectID = require("mongodb").ObjectId;
 
 // async function create(data, phone) {
 //   try {
@@ -48,8 +47,22 @@ async function getAll(req, res, next) {
   }
 }
 
+async function update(req, res, next) {
+  try {
+    const _user = req.body;
+    const result = await user.update(_user);
+    if (!result) {
+      throw new ErrorHandler(204, "Cannot update user");
+    }
+    return res.json({ errorCode: null, result });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   //   create,
   //   getOne,
   getAll,
+  update,
 };

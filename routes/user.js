@@ -13,5 +13,12 @@ commands = [
     api: "/users",
     middleware: ["authentication"],
   },
+  {
+    name: "update",
+    controller: "user",
+    method: "patch",
+    api: "/user",
+    middleware: ["authentication"],
+  },
 ];
 module.exports = commands;
