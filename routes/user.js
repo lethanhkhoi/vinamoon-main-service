@@ -1,11 +1,4 @@
 commands = [
-  // {
-  //   name: "getOne",
-  //   controller: "pickingAddress",
-  //   method: "get",
-  //   api: "/address/:code",
-  //   middleware: [],
-  // },
   {
     name: "getAll",
     controller: "user",
@@ -17,6 +10,13 @@ commands = [
     name: "update",
     controller: "user",
     method: "patch",
+    api: "/user",
+    middleware: ["authentication"],
+  },
+  {
+    name: "create",
+    controller: "user",
+    method: "post",
     api: "/user",
     middleware: ["authentication"],
   },

@@ -1,39 +1,17 @@
 const user = require("../dataModel/userCol");
 
-// async function create(data, phone) {
-//   try {
-//     data.lat = null;
-//     data.long = null;
-//     data.id = ObjectID().toString();
-//     data.requests = [
-//       {
-//         phone,
-//         count: 1,
-//       },
-//     ];
-//     await pickingAddressCol.create(data);
-//     return data;
-//   } catch (error) {
-//     return null;
-//   }
-// }
-
-// async function getOne(req, res, next) {
-//   try {
-//     const code = req.params.code;
-//     const result = await pickingAddressCol.getOneByCode(code);
-//     if (!result) {
-//       return res.status(200).send({
-//         errorCode: true,
-//         exitCode: 1,
-//         data: "Cannot find this address",
-//       });
-//     }
-//     return res.json({ errorCode: null, data: result });
-//   } catch (error) {
-//     next(error);
-//   }
-// }
+async function create(req, res, next) {
+  try {
+    const _user = req.body;
+    const result = await user.create(_user);
+    if (!result) {
+      throw new ErrorHandler(204, "Cannot create user");
+    }
+    return res.json({ errorCode: null, result });
+  } catch (error) {
+    return null;
+  }
+}
 
 async function getAll(req, res, next) {
   try {
@@ -61,8 +39,7 @@ async function update(req, res, next) {
 }
 
 module.exports = {
-  //   create,
-  //   getOne,
+  create,
   getAll,
   update,
 };

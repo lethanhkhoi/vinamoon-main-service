@@ -65,9 +65,19 @@ async function update(_user) {
   }
 }
 
+async function create(_user) {
+  try {
+    const result = await database.userModel().insertOne(_user);
+    return result;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
 module.exports = {
   getAll,
   update,
-  //   create,
+  create,
   //   getOne,
 };
