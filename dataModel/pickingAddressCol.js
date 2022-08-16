@@ -11,9 +11,7 @@ function joinAddress(phone, aggregate = []) {
 
 async function getOneByCode(code) {
   try {
-    console.log(code)
     const result = await database.pickingAddressModel().findOne({ id: code });
-    console.log(result)
     return result;
   } catch (error) {
     return null;

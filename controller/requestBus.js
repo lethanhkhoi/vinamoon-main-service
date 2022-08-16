@@ -47,6 +47,14 @@ async function createFromWeb(req, res, next) {
       });
     }
     data.pickingAddress = pickingAddressResult.id;
+    const result = await requestBusCol.create(data);
+    if (!result) {
+      return res.status(200).send({
+        errorCode: true,
+        exitCode: 1,
+        data: "Cannot create request",
+      });
+    }
     return res.json({ errorCode: null, data: data });
   } catch (error) {
     next(error);
@@ -137,6 +145,10 @@ async function create(req, res) {
             errorCode: true,
             data: "Update picking address fail",
           });
+        }
+        const tempUpdate = await requestBusCol.update(req.body.requestBusId, {pickingAddress: req.body.pickingAddressId})
+        if(tempUpdate){
+          return res.json({errorCode: null, data: tempUpdate})
         }
       }
     } else {
