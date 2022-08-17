@@ -5,24 +5,30 @@ var bcrypt = require("bcryptjs");
 var salt = bcrypt.genSaltSync(10);
 
 // const validateRequest = ["phone", "name", "pickingAddress", "vehicleId"];
-async function getAll() {
+async function getAll(query) {
   try {
     const sort = {
       role: 1,
     };
+    aggArray = [
+      { $sort: sort },
+      {
+        $lookup: {
+          from: "vehicle_type",
+          localField: "vehicle.typeId",
+          foreignField: "id",
+          as: "vehicleData",
+        },
+      },
+    ]
+    if (query) {
+      aggArray.push({
+        $match: query
+      })
+    }
     let users = await database
       .userModel()
-      .aggregate([
-        { $sort: sort },
-        {
-          $lookup: {
-            from: "vehicle_type",
-            localField: "vehicle.typeId",
-            foreignField: "id",
-            as: "vehicleData",
-          },
-        },
-      ])
+      .aggregate(aggArray)
       .toArray();
 
     users.forEach((element) => {
@@ -34,11 +40,8 @@ async function getAll() {
           name: element.vehicleData[0].name,
         };
       }
-      delete element.avatarFilename;
       delete element.vehicleData;
     });
-
-    console.log(users);
     return users;
   } catch (error) {
     return null;

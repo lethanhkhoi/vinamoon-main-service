@@ -1,4 +1,6 @@
 const user = require("../dataModel/userCol");
+const ObjectID = require("mongodb").ObjectId;
+const { cloudinary } = require('../utils/cloudinary')
 
 async function create(req, res, next) {
   try {
@@ -42,7 +44,31 @@ async function getAll(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const _user = req.body;
+    const _user = {}
+    const objectId = new ObjectID(req.body._id)
+    const oldUser = (await user.getAll({ _id: objectId }))[0]
+
+    for (const key in req.body) {
+      const value = req.body[key]
+      try {
+        _user[key] = JSON.parse(value)
+      } catch (err) {
+        _user[key] = value
+      }
+    }
+
+    if (req.files && req.files.length > 0) {
+      if (oldUser['avatarFilename']) {
+        try {
+          await cloudinary.uploader.destroy(oldUser['avatarFilename']);
+        } catch (err) {
+          console.log("Cannot delete old image")
+        }
+      }
+      _user['avatarPath'] = req.files[0].path
+      _user['avatarFilename'] = req.files[0].filename
+    }
+
     const result = await user.update(_user);
     if (!result) {
       throw new ErrorHandler(204, "Cannot update user");
