@@ -34,6 +34,7 @@ async function getAll() {
           name: element.vehicleData[0].name,
         };
       }
+      delete element.avatarFilename;
       delete element.vehicleData;
     });
 
