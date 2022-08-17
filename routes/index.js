@@ -3,6 +3,8 @@ const pickingAddressCommand = require("./pickingAddress.js");
 const vehicleCommand = require("./vehicle.js");
 const smsCommand = require("./sms.js");
 const userCommand = require("./user.js");
+const { config } = require("../config/constant");
+const { createUploader } = require('../utils/cloudinary')
 
 const event = [
   requestBusCommand,
@@ -20,9 +22,16 @@ const controllers = {
   user: require("../controller/user"),
 };
 
+const avatarImageUploader = createUploader(
+  config.CLOUDINARY_AVATAR_PATH,
+  ["png", "jpg"]
+)
+
 const middlewares = {
-  authentication: controllers.auth.userAuthentication,
+  'authentication': controllers.auth.userAuthentication,
+  'avatarImageUploader': avatarImageUploader.array('avatar', 1)
 };
+
 const bindRouter = (app) => {
   for (let i = 0; i < event.length; i++) {
     for (let j = 0; j < event[i].length; j++) {

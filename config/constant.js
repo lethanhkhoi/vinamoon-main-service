@@ -10,6 +10,13 @@ const config = {
   PORT: process.env.PORT || 3001,
   LOG_TOKEN: process.env.LOG_TOKEN,
   DEFAULT_PASSWORD: process.env.DEFAULT_PASSWORD,
+
+  COULDINARY_CONFIG: {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  },
+  CLOUDINARY_AVATAR_PATH: 'vinamoon/avatar'
 };
 
 const requestStatus = {
