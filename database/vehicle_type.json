@@ -1,0 +1,25 @@
+[{
+  "_id": {
+    "$oid": "62f6002b6f33f583e48a5cc1"
+  },
+  "seat": 1,
+  "name": "Xe máy",
+  "unitPrice": 5000,
+  "id": "62f6002b6f33f583e48a5cc1"
+},{
+  "_id": {
+    "$oid": "62f5fdfd6f33f583e48a5cc6"
+  },
+  "seat": 4,
+  "name": "Xe 4 chỗ",
+  "unitPrice": 15000,
+  "id": "62f5fdfd6f33f583e48a5cc5"
+},{
+  "_id": {
+    "$oid": "62f6002b6f33f583e48a5cc8"
+  },
+  "seat": 7,
+  "name": "Xe 7 chỗ",
+  "unitPrice": 30000,
+  "id": "62f6002b6f33f583e48a5cc7"
+}]

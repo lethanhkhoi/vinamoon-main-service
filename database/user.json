@@ -1,0 +1,77 @@
+[{
+  "_id": {
+    "$oid": "62c6a87d80e6856e81307991"
+  },
+  "password": "$2b$10$VTKr192lwws.xP/Xc6YuLeQsRbrUzM7iw61lbrqAa1yaOeuSCb5Ke",
+  "name": "Lê Thành Khôi",
+  "phone": "0904074895",
+  "address": "DH KHTN",
+  "gender": "male",
+  "role": "operator",
+  "createdAt": "2022-07-07T09:33:49.271Z",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjA5MDQwNzQ4OTUiLCJpYXQiOjE2NjAzMTIwODYsImV4cCI6MTY2MDkxNjg4Nn0.dPUO4W8ctGFxh8FztDiEDW2zqUFObH6qCG-8obY3M4k"
+},{
+  "_id": {
+    "$oid": "62cd2c02a67eeb3bb5e79b92"
+  },
+  "password": "$2a$12$7FtgZG.I/mNIGgPnGg.gyuFKpLYqcxd.qvyUE/QQRwcypcSoPFNnq",
+  "name": "Hoàng Như Thanh",
+  "phone": "0933442607",
+  "address": "DH KHTN",
+  "gender": "female",
+  "role": "admin",
+  "createdAt": {
+    "$date": "2022-07-07T09:33:49.271Z"
+  },
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjA5MzM0NDI2MDciLCJpYXQiOjE2NjA3NTUzNzYsImV4cCI6MTY2MTM2MDE3Nn0.gaccbw-Hb3knsqEa-F5jDD-OEALKJ7OUV_IyzrOYHAo"
+},{
+  "_id": {
+    "$oid": "62d3a96a4a6c1611b59ec431"
+  },
+  "password": "$2b$10$VSA081xU0X4enx4wgAX9beuhocvfYfmNrKQQM8Cox8/i64S5DI8zG",
+  "name": "Hoàng Thiện Nhân",
+  "phone": "0786774553",
+  "address": "225 Hoa Binh",
+  "gender": "male",
+  "role": "user",
+  "createdAt": {
+    "$date": "2022-07-17T06:17:14.380Z"
+  },
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEyMzUiLCJpYXQiOjE2NjAzMTI3ODQsImV4cCI6MTY2MDkxNzU4NH0.VWyPb-5_HFyW-3UccsZseh7bqrUfcNXnK9H_8aQ5d-4"
+},{
+  "_id": {
+    "$oid": "62d44823fd9ebac48a24e67a"
+  },
+  "password": "$2b$10$Q63yB3VNCp.cilwKteXAT.zbpkMwHe8PTqYP9E17LGJ7ZrGk4b7Oq",
+  "name": "Đỗ Vương Phúc",
+  "phone": "0707953475",
+  "address": "44 Bình Đông, Q.8",
+  "gender": "male",
+  "role": "driver",
+  "createdAt": "2022-07-17T17:34:27.488Z",
+  "refreshToken": null,
+  "vehicle": {
+    "typeId": "62f5fdfd6f33f583e48a5cc5",
+    "number": "49P1-12 16572",
+    "brand": "Toyota"
+  }
+},{
+  "_id": {
+    "$oid": "62f64a3aa9f0efda8b4a39fd"
+  },
+  "password": "$2b$10$1TOvUqsPNXMp9HZxbI5yeO5ZuEMOdDXvMn0R87bgz8BpL4llwYVW6",
+  "name": "Nguyễn Hoàng Long",
+  "phone": "0843395811",
+  "address": "227 Nguyen Van Cu",
+  "gender": "male",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjA4NDMzOTU4MTEiLCJpYXQiOjE2NjA3MTg0MDcsImV4cCI6MTY2MTMyMzIwN30.gz_OaFcyrmknT8oDkrmrmht0oqz31iCuYj13HGXz3yE",
+  "role": "driver",
+  "vehicle": {
+    "typeId": "62f6002b6f33f583e48a5cc7",
+    "number": "52Y6 12008",
+    "brand": "KIA Morning"
+  },
+  "createdAt": {
+    "$date": "2022-08-12T12:40:26.810Z"
+  }
+}]
