@@ -12,7 +12,16 @@ const config = {
   DEFAULT_PASSWORD: process.env.DEFAULT_PASSWORD,
 };
 
+const requestStatus = {
+  NEW: "New",
+  PENDING: "Pending",
+  ASSIGNED: "Assigned",
+  COMPLETED: "Completed",
+  CANCELED: "Canceled",
+};
+
 module.exports = {
   loggerConstant,
   config,
+  requestStatus,
 };

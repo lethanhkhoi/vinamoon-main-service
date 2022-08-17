@@ -1,11 +1,7 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
 const { ErrorHandler } = require("../middlewares/errorHandler");
-const ObjectID = require("mongodb").ObjectId;
 async function create(data, phone) {
   try {
-    data.lat = null;
-    data.long = null;
-    data.id = ObjectID().toString();
     data.requests = [
       {
         phone,
