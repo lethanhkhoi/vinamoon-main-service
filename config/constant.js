@@ -16,7 +16,7 @@ const config = {
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   },
-  CLOUDINARY_AVATAR_PATH: 'vinamoon/avatar'
+  CLOUDINARY_AVATAR_PATH: "vinamoon/avatar",
 };
 
 const requestStatus = {
@@ -27,8 +27,22 @@ const requestStatus = {
   CANCELED: "Canceled",
 };
 
+const device = {
+  MOBILE: "mobile",
+  WEB: "web",
+};
+
+const role = {
+  ADMIN: "admin",
+  USER: "user",
+  DRIVER: "driver",
+  OPERATOR: "operator",
+};
+
 module.exports = {
   loggerConstant,
   config,
   requestStatus,
+  device,
+  role,
 };

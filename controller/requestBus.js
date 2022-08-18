@@ -4,10 +4,10 @@ const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const { getDistance } = require("../utils/getDistance");
 const { getAddress } = require("../utils/googleAPI");
 const ObjectID = require("mongodb").ObjectId;
-const { requestStatus } = require("../config/constant");
+const { requestStatus, device } = require("../config/constant");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 
-const constructAddressObject = (obj) => {
+const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
   return {
     homeNo: obj.homeNo,
@@ -20,7 +20,7 @@ const constructAddressObject = (obj) => {
   };
 };
 
-const constructRequestObject = (obj) => {
+const constructRequestFromWeb = (obj) => {
   const id = new ObjectID();
   return {
     phone: obj.phone,
@@ -46,6 +46,7 @@ async function getAll(req, res, next) {
     next(error);
   }
 }
+
 async function createFromWeb(req, res, next) {
   try {
     const data = req.body;
@@ -59,16 +60,13 @@ async function createFromWeb(req, res, next) {
         });
       }
     }
-    const address = constructAddressObject(data);
-    const request = constructRequestObject(data);
+
+    const address = constructAddressFromWeb(data);
+    const request = constructRequestFromWeb(data);
 
     const pickingAddressResult = await pickingAddress.create(address, user);
     if (!pickingAddressResult) {
-      return res.status(200).send({
-        errorCode: true,
-        exitCode: 1,
-        data: "Cannot create picking address",
-      });
+      new ErrorHandler(200, "Cannot create picking address");
     }
     request.pickingAddress = pickingAddressResult.id;
     const result = await requestBusCol.create(request);
@@ -80,16 +78,13 @@ async function createFromWeb(req, res, next) {
     next(error);
   }
 }
+
 async function getOne(req, res, next) {
   try {
     const code = req.params.code;
     let result = await requestBusCol.getOne(code);
     if (!result) {
-      return res.status(200).send({
-        errorCode: true,
-        exitCode: 1,
-        data: "Cannot find request",
-      });
+      new ErrorHandler(200, "Cannot find request");
     }
     result.pickingLocation = result.pickingLocation[0];
     result.vehicleType = result.vehicleType[0];
@@ -102,8 +97,8 @@ async function getOne(req, res, next) {
 async function create(req, res) {
   try {
     const data = req.body;
-    const location = await pickingAddressCol.getAll();
-    const user = req.user;
+    console.log(data);
+
     for (property of requestBusCol.validateRequest) {
       if (data[property] === null) {
         return res.json({
@@ -112,9 +107,15 @@ async function create(req, res) {
         });
       }
     }
-    if (!req.body.origin) {
+
+    if (!data.origin?.lat || !data.origin?.long) {
       return res.json({ errorCode: true, data: "Please input long and lat" });
     }
+
+    const user = req.user;
+    console.log(user);
+
+    const location = await pickingAddressCol.getAll();
     const newLocationArray = location.filter((item) => item.long && item.lat);
     let distanceArray = [];
     newLocationArray.map((item, index) => {
@@ -124,11 +125,13 @@ async function create(req, res) {
       );
       distanceArray.push(distance);
     });
+
     const min = Math.min(...distanceArray);
     const minIndex = distanceArray.indexOf(min);
     let pickingLocation = newLocationArray[minIndex];
+
     if (min > 0.003) {
-      if (req.body.device === "mobile") {
+      if (req.body.device === device.MOBILE) {
         const address = await getAddress(
           req.body.origin.lat,
           req.body.origin.long
@@ -149,6 +152,7 @@ async function create(req, res) {
             },
           ],
         };
+
         const create = await pickingAddressCol.create(pickingLocation);
         if (!create) {
           return res.json({
@@ -156,7 +160,7 @@ async function create(req, res) {
             data: "Cannot create new picking address",
           });
         }
-      } else if (req.body.device === "web") {
+      } else if (req.body.device === device.WEB) {
         pickingLocation = await pickingAddressCol.getOneByCode(
           req.body.pickingAddressId
         );
@@ -166,15 +170,18 @@ async function create(req, res) {
           req.body.pickingAddressId,
           pickingLocation
         );
+
         if (!resultUpdate) {
           return res.json({
             errorCode: true,
             data: "Update picking address fail",
           });
         }
+
         const tempUpdate = await requestBusCol.update(req.body.requestBusId, {
           pickingAddress: req.body.pickingAddressId,
         });
+
         if (tempUpdate) {
           return res.json({ errorCode: null, data: tempUpdate });
         }
@@ -189,10 +196,12 @@ async function create(req, res) {
           });
         }
       });
+
       const updated = await pickingAddressCol.update(
         pickingLocation.id,
         pickingLocation
       );
+
       if (!updated) {
         return res.json({
           errorCode: true,
@@ -200,6 +209,7 @@ async function create(req, res) {
         });
       }
     }
+
     const requestBusData = {
       id: ObjectID().toString(),
       phone: user.phone,
@@ -225,6 +235,7 @@ async function create(req, res) {
     next(error);
   }
 }
+
 module.exports = {
   getAll,
   createFromWeb,
