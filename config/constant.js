@@ -39,10 +39,15 @@ const role = {
   OPERATOR: "operator",
 };
 
+const requestConstant = {
+  MAX_DISTANCE: 100,
+};
+
 module.exports = {
   loggerConstant,
   config,
   requestStatus,
   device,
   role,
+  requestConstant,
 };

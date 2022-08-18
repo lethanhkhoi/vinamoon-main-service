@@ -1,4 +1,5 @@
 const database = require("../utils/database");
+const { requestConstant } = require("../config/constant");
 
 function joinAddress(phone, aggregate = []) {
   aggregate.push(
@@ -26,6 +27,29 @@ async function getFrequency(phone) {
       .toArray();
     return result;
   } catch (error) {
+    return null;
+  }
+}
+
+async function getNearest(location) {
+  try {
+    const result = await database
+      .pickingAddressModel()
+      .find({
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [location.long, location.lat],
+            },
+            $maxDistance: requestConstant.MAX_DISTANCE,
+          },
+        },
+      })
+      .toArray();
+    return result;
+  } catch (error) {
+    console.log(error);
     return null;
   }
 }
@@ -63,4 +87,5 @@ module.exports = {
   getOneByCode,
   getFrequency,
   getAll,
+  getNearest,
 };
