@@ -73,18 +73,14 @@ async function getOne(code) {
   }
 }
 
-async function findOneAndUpdateStatus(code, newStatus) {
+async function findOneAndUpdate(code, query) {
   try {
-    console.log(code, newStatus);
     const result = await database.requestModel().findOneAndUpdate(
       { id: code },
       {
-        $set: {
-          status: newStatus,
-        },
+        $set: query,
       }
     );
-    console.log(result);
     return result;
   } catch (error) {
     return null;
@@ -97,5 +93,5 @@ module.exports = {
   getOne,
   validateRequest,
   validateRequestWithLocation,
-  findOneAndUpdateStatus,
+  findOneAndUpdate,
 };

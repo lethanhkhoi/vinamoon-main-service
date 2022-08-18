@@ -10,6 +10,15 @@ function joinAddress(phone, aggregate = []) {
   return aggregate;
 }
 
+async function removeOneByCode(code) {
+  try {
+    const result = await database.pickingAddressModel().deleteOne({ id: code });
+    return result;
+  } catch (error) {
+    return null;
+  }
+}
+
 async function getOneByCode(code) {
   try {
     const result = await database.pickingAddressModel().findOne({ id: code });
@@ -35,17 +44,18 @@ async function getNearest(location) {
   try {
     const result = await database
       .pickingAddressModel()
-      .find({
-        location: {
-          $near: {
-            $geometry: {
-              type: "Point",
-              coordinates: [location.long, location.lat],
-            },
-            $maxDistance: requestConstant.MAX_DISTANCE,
+      .aggregate([
+        {
+          $geoNear: {
+            near: [location.long, location.lat],
+            spherical: true,
+            distanceField: "distance",
+            maxDistance: requestConstant.MAX_DISTANCE,
           },
         },
-      })
+        { $sort: { distance: 1 } },
+        { $limit: 1 },
+      ])
       .toArray();
     return result;
   } catch (error) {
@@ -63,6 +73,7 @@ async function create(data) {
     return null;
   }
 }
+
 async function update(code, data) {
   try {
     data["updatedAt"] = new Date();
@@ -74,6 +85,7 @@ async function update(code, data) {
     return null;
   }
 }
+
 async function getAll() {
   try {
     return await database.pickingAddressModel().find().toArray();
@@ -81,6 +93,7 @@ async function getAll() {
     return null;
   }
 }
+
 module.exports = {
   create,
   update,
@@ -88,4 +101,5 @@ module.exports = {
   getFrequency,
   getAll,
   getNearest,
+  removeOneByCode,
 };

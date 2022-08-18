@@ -19,7 +19,6 @@ const constructAddressFromWeb = (obj) => {
     district: obj.district,
     ward: obj.ward,
     city: obj.city,
-    device: obj.device,
     _id: id,
     id: id.toString(),
   };
@@ -33,6 +32,7 @@ const constructRequestFromWeb = (obj) => {
     vehicleId: obj.vehicleId,
     date: new Date(),
     status: requestStatus.NEW,
+    device: obj.device || device.WEB,
     _id: id,
     id: id.toString(),
   };
@@ -56,27 +56,18 @@ async function createFromWeb(req, res, next) {
   try {
     const data = req.body;
     const user = req.body.phone ?? req.user.phone;
-    for (property in requestBusCol.validateRequest) {
-      if (data[property] === null) {
-        return res.status(200).send({
-          errorCode: true,
-          exitCode: 1,
-          data: "Missing property",
-        });
-      }
-    }
 
     const address = constructAddressFromWeb(data);
     const request = constructRequestFromWeb(data);
 
     const pickingAddressResult = await pickingAddress.create(address, user);
     if (!pickingAddressResult) {
-      new ErrorHandler(200, "Cannot create picking address");
+      new ErrorHandler(204, "Cannot create picking address");
     }
     request.pickingAddress = pickingAddressResult.id;
     const result = await requestBusCol.create(request);
     if (!result) {
-      new ErrorHandler(200, "Cannot create request");
+      new ErrorHandler(204, "Cannot create request");
     }
     return res.json({ errorCode: null, data: data });
   } catch (error) {
@@ -90,7 +81,7 @@ async function getOne(req, res, next) {
     const code = req.params.code;
     let result = await requestBusCol.getOne(code);
     if (!result) {
-      new ErrorHandler(200, "Cannot find request");
+      new ErrorHandler(204, "Cannot find request");
     }
     result.pickingLocation = result.pickingLocation[0];
     result.vehicleType = result.vehicleType[0];
@@ -100,12 +91,44 @@ async function getOne(req, res, next) {
   }
 }
 
+async function processWithNearest(data, nearest, phone) {
+  let exist = false;
+  const requests = nearest.requests.map((item) => {
+    if (item.phone === phone) {
+      exist = true;
+      return { ...item, count: item.count + 1 };
+    }
+    return item;
+  });
+
+  if (!exist) {
+    requests.push({ phone, count: 1 });
+  }
+
+  await pickingAddressCol.update(nearest.id, {
+    ...nearest,
+    requests,
+  });
+
+  if (nearest.distance > 0 && data.device === device.WEB) {
+    await pickingAddressCol.removeOneByCode(data.pickingAddressId);
+    await requestBusCol.findOneAndUpdate(data.requestBusId, {
+      pickingAddress: nearest.id,
+    });
+  }
+
+  const result = await requestBusCol.findOneAndUpdate(data.requestBusId, {
+    status: requestStatus.PENDING,
+  });
+
+  return result;
+}
+
 async function create(req, res) {
   try {
     let data = req.body;
-
     if (!data.origin) {
-      new ErrorHandler(200, "Missing origin");
+      new ErrorHandler(204, "Missing origin");
     }
 
     const processor = new RequestProcessor();
@@ -120,9 +143,12 @@ async function create(req, res) {
 
     if (nearest.length > 0) {
       nearest = nearest[0];
-      console.log("Nearest", nearest);
+      const phone = processor.getPhone(req);
+
+      const result = await processWithNearest(data, nearest, phone);
+      return res.json({ errorCode: null, result: result });
     } else {
-      console.log("No nearest");
+      // console.log("create new");
       processor.create(data);
     }
 

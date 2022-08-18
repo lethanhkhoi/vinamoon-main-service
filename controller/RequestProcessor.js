@@ -13,10 +13,16 @@ class RequestProcessor {
   create(data) {
     return this.request.create(data);
   }
+  getPhone(data) {
+    return this.request.getPhone(data);
+  }
 }
 
 class MobileRequest {
   constructor() {
+    this.getPhone = function (req) {
+      return req.user.phone;
+    };
     this.create = function (data) {
       // calculations...
       return "$45.95";
@@ -26,6 +32,10 @@ class MobileRequest {
 
 class WebRequest {
   constructor() {
+    this.getPhone = function (req) {
+      return req.body.phone;
+    };
+
     this.create = async function (data) {
       const requestId = data.requestBusId;
       const addressId = data.pickingAddressId;
@@ -46,9 +56,9 @@ class WebRequest {
 
       const newStatus = requestStatus.PENDING;
 
-      const resultUpdateRequest = await requestBusCol.findOneAndUpdateStatus(
+      const resultUpdateRequest = await requestBusCol.findOneAndUpdate(
         requestId,
-        newStatus
+        { status: newStatus }
       );
       if (!resultUpdateRequest) {
         new ErrorHandler(200, "Cannot update request");
