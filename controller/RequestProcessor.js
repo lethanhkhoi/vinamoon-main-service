@@ -2,6 +2,7 @@ const { ErrorHandler } = require("../middlewares/errorHandler");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
 const { requestStatus } = require("../config/constant");
+const { getAddress } = require("../utils/googleAPI");
 
 class RequestProcessor {
   constructor() {
@@ -23,9 +24,52 @@ class MobileRequest {
     this.getPhone = function (req) {
       return req.user.phone;
     };
-    this.create = function (data) {
-      // calculations...
-      return "$45.95";
+
+    this.create = async function (data) {
+      const address = await getAddress(data.origin.lat, data.origin.long);
+
+      let pickingLocation = {
+        id: new ObjectID().toString(),
+        homeNo: address[0].long_name,
+        street: address[1].long_name,
+        district: address[2].long_name,
+        ward: "",
+        city: address[3].long_name,
+        location: data.origin,
+        requests: [
+          {
+            phone: data.user.phone,
+            count: 1,
+          },
+        ],
+      };
+
+      const createAddressResult = await pickingAddressCol.create(
+        pickingLocation
+      );
+      if (!createAddressResult) {
+        throw new ErrorHandler(204, "Cannot create picking address");
+      }
+
+      const newRequest = {
+        id: new ObjectID().toString(),
+        phone: data.user.phone,
+        name: data.user.name,
+        vehicleId: data.vehicleId,
+        pickingAddress: pickingLocation.id,
+        status: requestStatus.PENDING,
+        destination: {
+          lat: data.destination.lat,
+          long: data.destination.long,
+        },
+      };
+
+      const createRequestResult = await requestBusCol.create(newRequest);
+      if (!createRequestResult) {
+        throw new ErrorHandler(204, "Cannot create booking request");
+      }
+
+      return createRequestResult;
     };
   }
 }
@@ -51,7 +95,7 @@ class WebRequest {
         pickingAddress
       );
       if (!resultUpdateAddress) {
-        new ErrorHandler(200, "Cannot update picking address");
+        throw new ErrorHandler(204, "Cannot update picking address");
       }
 
       const newStatus = requestStatus.PENDING;
@@ -61,7 +105,7 @@ class WebRequest {
         { status: newStatus }
       );
       if (!resultUpdateRequest) {
-        new ErrorHandler(200, "Cannot update request");
+        throw new ErrorHandler(204, "Cannot update request");
       }
 
       return resultUpdateRequest;
