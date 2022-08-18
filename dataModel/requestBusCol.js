@@ -2,6 +2,14 @@ const { dataPagination } = require("../helperFunction/helper");
 const database = require("../utils/database");
 
 const validateRequest = ["homeNo", "street", "district", "city", "vehicleId"];
+const validateRequestWithLocation = [
+  "homeNo",
+  "street",
+  "district",
+  "city",
+  "vehicleId",
+  "origin",
+];
 
 function joinAddress(aggregate = []) {
   aggregate.push({
@@ -65,9 +73,29 @@ async function getOne(code) {
   }
 }
 
+async function findOneAndUpdateStatus(code, newStatus) {
+  try {
+    console.log(code, newStatus);
+    const result = await database.requestModel().findOneAndUpdate(
+      { id: code },
+      {
+        $set: {
+          status: newStatus,
+        },
+      }
+    );
+    console.log(result);
+    return result;
+  } catch (error) {
+    return null;
+  }
+}
+
 module.exports = {
   getAll,
   create,
   getOne,
   validateRequest,
+  validateRequestWithLocation,
+  findOneAndUpdateStatus,
 };

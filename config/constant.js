@@ -40,7 +40,7 @@ const role = {
 };
 
 const requestConstant = {
-  MAX_DISTANCE: 100,
+  MAX_DISTANCE: 50,
 };
 
 module.exports = {

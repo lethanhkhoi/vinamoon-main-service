@@ -1,11 +1,15 @@
 const requestBusCol = require("../dataModel/requestBusCol");
 const pickingAddress = require("./pickingAddress.js");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
-const { getDistance } = require("../utils/getDistance");
 const { getAddress } = require("../utils/googleAPI");
 const ObjectID = require("mongodb").ObjectId;
 const { requestStatus, device } = require("../config/constant");
 const { ErrorHandler } = require("../middlewares/errorHandler");
+const {
+  RequestProcessor,
+  WebRequest,
+  MobileRequest,
+} = require("../controller/RequestProcessor");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -15,12 +19,9 @@ const constructAddressFromWeb = (obj) => {
     district: obj.district,
     ward: obj.ward,
     city: obj.city,
+    device: obj.device,
     _id: id,
     id: id.toString(),
-    location: {
-      long: null,
-      lat: null,
-    },
   };
 };
 
@@ -36,6 +37,20 @@ const constructRequestFromWeb = (obj) => {
     id: id.toString(),
   };
 };
+
+function constructNewAddress(obj) {
+  const id = new ObjectID();
+  return {
+    homeNo: obj.homeNo,
+    street: obj.street,
+    district: obj.district,
+    ward: obj.ward,
+    city: obj.city,
+    device: obj.device,
+    _id: id,
+    id: id.toString(),
+  };
+}
 
 async function getAll(req, res, next) {
   try {
@@ -79,6 +94,7 @@ async function createFromWeb(req, res, next) {
     }
     return res.json({ errorCode: null, data: data });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
@@ -102,40 +118,32 @@ async function create(req, res) {
   try {
     let data = req.body;
 
-    for (property of requestBusCol.validateRequest) {
-      if (data[property] === null) {
-        return res.json({
-          errorCode: true,
-          data: `Missing property ${property}`,
-        });
-      }
+    if (!data.origin) {
+      new ErrorHandler(200, "Missing origin");
     }
 
-    if (!data.origin?.lat || !data.origin?.long) {
-      return res.json({ errorCode: true, data: "Please input long and lat" });
+    const processor = new RequestProcessor();
+    if (data.device === device.WEB) {
+      processor.setStrategy(new WebRequest());
+    } else if (data.device === device.MOBILE) {
+      processor.setStrategy(new MobileRequest());
     }
-
-    // const user = req.user;
-    // console.log(user);
 
     const location = data.origin;
     let nearest = await pickingAddressCol.getNearest(location);
+
     if (nearest.length > 0) {
       nearest = nearest[0];
+      console.log("Nearest", nearest);
+    } else {
+      console.log("No nearest");
+      try {
+        processor.create(data);
+      } catch (error) {
+        console.log(error);
+        next(error);
+      }
     }
-
-    console.log("nearest", nearest);
-
-    // const location = await pickingAddressCol.getAll();
-    // const newLocationArray = location.filter((item) => item.long && item.lat);
-    // let distanceArray = [];
-    // newLocationArray.map((item, index) => {
-    //   const distance = getDistance(
-    //     { lat1: item.lat, lon1: item.long },
-    //     { lat2: req.body.origin.lat, lon2: req.body.origin.long }
-    //   );
-    //   distanceArray.push(distance);
-    // });
 
     // const min = Math.min(...distanceArray);
     // const minIndex = distanceArray.indexOf(min);
