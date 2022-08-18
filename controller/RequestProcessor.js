@@ -31,7 +31,6 @@ class WebRequest {
       const addressId = data.pickingAddressId;
 
       let pickingAddress = await pickingAddressCol.getOneByCode(addressId);
-
       pickingAddress.location = {
         long: data.origin.long,
         lat: data.origin.lat,
@@ -41,7 +40,6 @@ class WebRequest {
         addressId,
         pickingAddress
       );
-
       if (!resultUpdateAddress) {
         new ErrorHandler(200, "Cannot update picking address");
       }
@@ -52,26 +50,14 @@ class WebRequest {
         requestId,
         newStatus
       );
-
       if (!resultUpdateRequest) {
         new ErrorHandler(200, "Cannot update request");
       }
 
-      return res.json({ errorCode: null, data: resultUpdateRequest });
+      return resultUpdateRequest;
     };
   }
 }
-
-// function prepareCreateAddress(data) {
-//   // const data = req.body;
-//   // const address = constructAddressFromWeb(data);
-//   // const user = req.user.phone;
-//   // return pickingAddress.create(address, user);
-// }
-
-// function prepareIncreaseFrequency(data) {
-//   // return pickingAddressCol.increaseFrequency(phone);
-// }
 
 module.exports = {
   RequestProcessor,
