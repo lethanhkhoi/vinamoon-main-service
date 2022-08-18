@@ -38,20 +38,6 @@ const constructRequestFromWeb = (obj) => {
   };
 };
 
-function constructNewAddress(obj) {
-  const id = new ObjectID();
-  return {
-    homeNo: obj.homeNo,
-    street: obj.street,
-    district: obj.district,
-    ward: obj.ward,
-    city: obj.city,
-    device: obj.device,
-    _id: id,
-    id: id.toString(),
-  };
-}
-
 async function getAll(req, res, next) {
   try {
     let data = await requestBusCol.getAll();
@@ -137,12 +123,7 @@ async function create(req, res) {
       console.log("Nearest", nearest);
     } else {
       console.log("No nearest");
-      try {
-        processor.create(data);
-      } catch (error) {
-        console.log(error);
-        next(error);
-      }
+      processor.create(data);
     }
 
     // const min = Math.min(...distanceArray);
