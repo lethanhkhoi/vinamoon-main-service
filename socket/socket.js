@@ -16,11 +16,11 @@ module.exports = (socket) => {
 
   socket.on("driver update", async (request) => {
     try {
-      request = JSON.parse(request)
+      console.log(request)
       const { data } = await axios.post(`${process.env.CACHE_URL}`, {
         lat: request.lat,
         long: request.long,
-        label: request.userId
+        label: request.driverId
       });
       console.log(data)
     } catch (error) {

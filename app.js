@@ -31,6 +31,7 @@ const server = http.createServer(app);
 const io = new Server(server, {});
 
 io.on("connection", (socket) => {
+  console.log(`User connected. SocketId: ${socket.id}`)
   require("./socket/socket.js")(socket)
   return io
 });
