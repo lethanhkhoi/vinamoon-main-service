@@ -1,6 +1,4 @@
-const config = require("../config/app.json");
 const SMS = require("../utils/sms");
-const client = require("twilio")(config.accountsId, config.smsToken);
 
 async function sendSMS(req, res, next) {
   try {
