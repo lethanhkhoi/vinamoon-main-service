@@ -8,7 +8,9 @@ const {
   RequestProcessor,
   WebRequest,
   MobileRequest,
+  MobileRequestNearest,
 } = require("../controller/RequestProcessor");
+const { dataPagination } = require("../helperFunction/helper");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -109,11 +111,17 @@ async function processWithNearest(data, nearest, phone) {
     requests,
   });
 
-  if (nearest.distance > 0 && data.device === device.WEB) {
-    await pickingAddressCol.removeOneByCode(data.pickingAddressId);
-    await requestBusCol.findOneAndUpdate(data.requestBusId, {
-      pickingAddress: nearest.id,
-    });
+  if (nearest.distance > 0) {
+    if (data.device === device.WEB) {
+      await pickingAddressCol.removeOneByCode(data.pickingAddressId);
+      await requestBusCol.findOneAndUpdate(data.requestBusId, {
+        pickingAddress: nearest.id,
+      });
+    } else {
+      data.pickingAddressId = nearest.id;
+      processor.setStrategy(new MobileRequestNearest());
+      return (result = await processor.create(data));
+    }
   }
 
   const result = await requestBusCol.findOneAndUpdate(data.requestBusId, {
@@ -123,7 +131,7 @@ async function processWithNearest(data, nearest, phone) {
   return result;
 }
 
-async function create(req, res) {
+async function create(req, res, next) {
   try {
     let data = req.body;
     if (!data.origin) {
@@ -131,12 +139,11 @@ async function create(req, res) {
     }
 
     const processor = new RequestProcessor();
-    const phone = processor.getPhone(req);
+    const phone = data.phone;
 
     if (data.device === device.WEB) {
       processor.setStrategy(new WebRequest());
     } else if (data.device === device.MOBILE) {
-      data.user = req.user;
       processor.setStrategy(new MobileRequest());
     }
 
