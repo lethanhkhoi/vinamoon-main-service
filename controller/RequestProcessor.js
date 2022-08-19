@@ -3,6 +3,7 @@ const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
 const { requestStatus } = require("../config/constant");
 const { getAddress } = require("../utils/googleAPI");
+const { dataPagination } = require("../helperFunction/helper");
 
 class RequestProcessor {
   constructor() {
@@ -74,6 +75,35 @@ class MobileRequest {
   }
 }
 
+class MobileRequestNearest {
+  constructor() {
+    this.getPhone = function (req) {
+      return req.user.phone;
+    };
+
+    this.create = async function (data) {
+      const newRequest = {
+        id: new ObjectID().toString(),
+        phone: data.user.phone,
+        name: data.user.name,
+        vehicleId: data.vehicleId,
+        pickingAddress: data.pickingAddressId,
+        status: requestStatus.PENDING,
+        destination: {
+          lat: data.destination.lat,
+          long: data.destination.long,
+        },
+      };
+
+      const createRequestResult = await requestBusCol.create(newRequest);
+      if (!createRequestResult) {
+        throw new ErrorHandler(204, "Cannot create booking request");
+      }
+      return createRequestResult;
+    };
+  }
+}
+
 class WebRequest {
   constructor() {
     this.getPhone = function (req) {
@@ -116,5 +146,6 @@ class WebRequest {
 module.exports = {
   RequestProcessor,
   MobileRequest,
+  MobileRequestNearest,
   WebRequest,
 };

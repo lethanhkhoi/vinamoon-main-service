@@ -1,6 +1,6 @@
 const axios = require("axios");
 const { ErrorHandler } = require("../middlewares/errorHandler");
-const API_AUTHENTICATION = process.env.AUTHENTICATION
+const API_AUTHENTICATION = process.env.AUTHENTICATION;
 async function userAuthentication(req, res, next) {
   try {
     let token = req.headers["token"];
@@ -17,7 +17,10 @@ async function userAuthentication(req, res, next) {
       },
     });
     if (response.data.errorCode === true || response.status === 401) {
-      throw new ErrorHandler(401, "Authentication fail");
+      throw new ErrorHandler(
+        401,
+        response.data.message || "Authentication fail"
+      );
     }
     const data = response.data.data;
     req.user = { _id: data._id, phone: data.phone, name: data.name };
