@@ -1,43 +1,43 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
-const { Server } = require("socket.io");
-const driver =[]
-const createSocket = (server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: "*",
-      methods: "GET,POST,PUT, PATCH, DELETE",
-    },
+const axios = require("axios");
+
+module.exports = (socket) => {
+  socket.on("bookCar", (request) => {
+    try {
+      io.emit(request.roomId, "From server");
+      logger.info(`Broadcast request from user ${socket.id}`, {
+        request: request,
+      });
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
   });
 
-  io.on("connection", (socket) => {
-    logger.info(`User connected. SocketId: ${socket.id}`, {
+  socket.on("driver update", async (request) => {
+    try {
+      request = JSON.parse(request)
+      const { data } = await axios.post(`${process.env.CACHE_URL}`, {
+        lat: request.lat,
+        long: request.long,
+        label: request.userId
+      });
+      console.log(data)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
+
+  socket.on("location", (data) => {
+    console.log(data);
+    io.emit("bookCar", data);
+  });
+
+  socket.on("disconnect", () => {
+    logger.info(`User disconnected. SocketId: ${socket.id}`, {
       socketId: socket.id,
     });
-    socket.on("bookCar", (request) => {
-      try {
-        io.emit(request.roomId, "From server");
-        logger.info(`Broadcast request from user ${socket.id}`, {
-          request: request,
-        });
-      } catch (error) {
-        logger.error(error);
-        next(error);
-      }
-    });
-
-    socket.on("location", (data) => {
-      console.log(data);
-      io.emit("bookCar", data);
-    });
-
-    socket.on("disconnect", () => {
-      logger.info(`User disconnected. SocketId: ${socket.id}`, {
-        socketId: socket.id,
-      });
-      console.log("User disconnected");
-    });
+    console.log("User disconnected");
   });
-};
-module.exports = {
-  createSocket,
-};
+}
