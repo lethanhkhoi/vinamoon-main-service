@@ -1,0 +1,70 @@
+[{
+  "_id": {
+    "$oid": "62d1a4da9640aa33eccdda48"
+  },
+  "phone": "0933442608",
+  "name": "Như Thanh",
+  "pickingAddress": "62bbcb6c9d04bc4866a306f8",
+  "vehicleId": "62f5fdfd6f33f583e48a5cc5",
+  "date": {
+    "$date": "2022-07-15T17:33:14.142Z"
+  },
+  "status": "New",
+  "id": "62d1a4da9640aa33eccdda48"
+},{
+  "_id": {
+    "$oid": "62d1a5b6d10f43a2804901ab"
+  },
+  "phone": "0933442608",
+  "name": "Phúc",
+  "pickingAddress": "62bbcb6c9d04bc4866a306f8",
+  "vehicleId": "62f5fdfd6f33f583e48a5cc5",
+  "type": true,
+  "date": {
+    "$date": "2022-07-15T17:36:54.248Z"
+  },
+  "status": "New",
+  "id": "62d1a5b6d10f43a2804901ab"
+},{
+  "_id": {
+    "$oid": "62d1a619f42beabca1b582de"
+  },
+  "phone": "0933442688",
+  "name": "Thành Khôi",
+  "pickingAddress": "62bbcb6c9d04bc4866a306f8",
+  "vehicleId": "62f5fdfd6f33f583e48a5cc5",
+  "type": true,
+  "date": {
+    "$date": "2022-07-15T17:38:33.225Z"
+  },
+  "status": "New",
+  "id": "62d1a619f42beabca1b582de"
+},{
+  "_id": {
+    "$oid": "62d1a6fd51bda225c896f07f"
+  },
+  "phone": "0933442689",
+  "name": "Minh Hằng",
+  "pickingAddress": "62bbcb6c9d04bc4866a306f9",
+  "vehicleId": "62f6002b6f33f583e48a5cc7",
+  "type": true,
+  "date": {
+    "$date": "2022-07-15T17:42:21.092Z"
+  },
+  "status": "New",
+  "id": "62d1a6fd51bda225c896f07f"
+},{
+  "_id": {
+    "$oid": "62d3fe3aae007f1c32e8c4e7"
+  },
+  "phone": "0909910777",
+  "name": "Nhân Hoàng",
+  "pickingAddress": "62bbcb6c9d04bc4866a306f9",
+  "vehicleId": "62f6002b6f33f583e48a5cc7",
+  "type": true,
+  "date": {
+    "$date": "2022-07-17T12:19:06.600Z"
+  },
+  "status": "New",
+  "id": "62d3fe3aae007f1c32e8c4e7"
+}]

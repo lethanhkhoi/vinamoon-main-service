@@ -1,29 +1,30 @@
 const ObjectID = require("mongodb").ObjectId;
 const database = require("../utils/database");
-const { config } = require("../config/constant");
-var bcrypt = require("bcryptjs");
-var salt = bcrypt.genSaltSync(10);
+const { role } = require("../config/constant");
 
 // const validateRequest = ["phone", "name", "pickingAddress", "vehicleId"];
-async function getAll() {
+async function getAll(query) {
   try {
     const sort = {
       role: 1,
     };
-    let users = await database
-      .userModel()
-      .aggregate([
-        { $sort: sort },
-        {
-          $lookup: {
-            from: "vehicle_type",
-            localField: "vehicle.typeId",
-            foreignField: "id",
-            as: "vehicleData",
-          },
+    aggArray = [
+      { $sort: sort },
+      {
+        $lookup: {
+          from: "vehicle_type",
+          localField: "vehicle.typeId",
+          foreignField: "id",
+          as: "vehicleData",
         },
-      ])
-      .toArray();
+      },
+    ];
+    if (query) {
+      aggArray.push({
+        $match: query,
+      });
+    }
+    let users = await database.userModel().aggregate(aggArray).toArray();
 
     users.forEach((element) => {
       delete element.refreshToken;
@@ -36,8 +37,6 @@ async function getAll() {
       }
       delete element.vehicleData;
     });
-
-    console.log(users);
     return users;
   } catch (error) {
     return null;
@@ -48,7 +47,7 @@ async function update(_user) {
   try {
     const _id = _user._id;
     delete _user._id;
-    if (_user.role !== "driver") {
+    if (_user.role !== role.DRIVER) {
       _user = {
         ..._user,
         vehicle: null,
@@ -70,16 +69,6 @@ async function update(_user) {
 
 async function create(_user) {
   try {
-    var hashPassword = bcrypt.hashSync(
-      _user.password || config.DEFAULT_PASSWORD,
-      salt
-    );
-
-    _user = {
-      ..._user,
-      password: hashPassword,
-    };
-
     const result = await database.userModel().insertOne(_user);
     return result;
   } catch (error) {

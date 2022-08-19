@@ -1,4 +1,5 @@
 const database = require("../utils/database");
+const { requestConstant } = require("../config/constant");
 
 function joinAddress(phone, aggregate = []) {
   aggregate.push(
@@ -7,6 +8,15 @@ function joinAddress(phone, aggregate = []) {
     { $limit: 5 }
   );
   return aggregate;
+}
+
+async function removeOneByCode(code) {
+  try {
+    const result = await database.pickingAddressModel().deleteOne({ id: code });
+    return result;
+  } catch (error) {
+    return null;
+  }
 }
 
 async function getOneByCode(code) {
@@ -30,6 +40,30 @@ async function getFrequency(phone) {
   }
 }
 
+async function getNearest(location) {
+  try {
+    const result = await database
+      .pickingAddressModel()
+      .aggregate([
+        {
+          $geoNear: {
+            near: [location.long, location.lat],
+            spherical: true,
+            distanceField: "distance",
+            maxDistance: requestConstant.MAX_DISTANCE,
+          },
+        },
+        { $sort: { distance: 1 } },
+        { $limit: 1 },
+      ])
+      .toArray();
+    return result;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
 async function create(data) {
   try {
     data["createdAt"] = new Date();
@@ -39,6 +73,7 @@ async function create(data) {
     return null;
   }
 }
+
 async function update(code, data) {
   try {
     data["updatedAt"] = new Date();
@@ -50,6 +85,7 @@ async function update(code, data) {
     return null;
   }
 }
+
 async function getAll() {
   try {
     return await database.pickingAddressModel().find().toArray();
@@ -57,10 +93,13 @@ async function getAll() {
     return null;
   }
 }
+
 module.exports = {
   create,
   update,
   getOneByCode,
   getFrequency,
   getAll,
+  getNearest,
+  removeOneByCode,
 };

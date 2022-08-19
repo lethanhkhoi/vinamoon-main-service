@@ -11,14 +11,14 @@ commands = [
     controller: "user",
     method: "patch",
     api: "/user",
-    middleware: ["authentication"],
+    middleware: ["authentication", "avatarImageUploader"],
   },
   {
     name: "create",
     controller: "user",
     method: "post",
     api: "/user",
-    middleware: ["authentication"],
+    middleware: ["authentication", "avatarImageUploader"],
   },
 ];
 module.exports = commands;

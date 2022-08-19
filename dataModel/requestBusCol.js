@@ -1,7 +1,16 @@
 const { dataPagination } = require("../helperFunction/helper");
 const database = require("../utils/database");
 
-const validateRequest = ["homeNo","street","district","city","vehicleId"];
+const validateRequest = ["homeNo", "street", "district", "city", "vehicleId"];
+const validateRequestWithLocation = [
+  "homeNo",
+  "street",
+  "district",
+  "city",
+  "vehicleId",
+  "origin",
+];
+
 function joinAddress(aggregate = []) {
   aggregate.push({
     $lookup: {
@@ -14,7 +23,7 @@ function joinAddress(aggregate = []) {
   aggregate.push({
     $lookup: {
       from: "vehicle_type",
-      localField: "vehicleTypeId",
+      localField: "vehicleId",
       foreignField: "id",
       as: "vehicleType",
     },
@@ -39,7 +48,7 @@ async function getAll() {
 }
 async function create(data) {
   try {
-    data["createdAt"] = new Date()
+    data["createdAt"] = new Date();
     const result = await database.requestModel().insertOne(data);
     return result;
   } catch (error) {
@@ -64,9 +73,25 @@ async function getOne(code) {
   }
 }
 
+async function findOneAndUpdate(code, query) {
+  try {
+    const result = await database.requestModel().findOneAndUpdate(
+      { id: code },
+      {
+        $set: query,
+      }
+    );
+    return result;
+  } catch (error) {
+    return null;
+  }
+}
+
 module.exports = {
   getAll,
   create,
   getOne,
   validateRequest,
+  validateRequestWithLocation,
+  findOneAndUpdate,
 };

@@ -2,11 +2,6 @@ const vehicleCol = require("../dataModel/vehicleCol");
 const ObjectID = require("mongodb").ObjectId;
 async function create(req, res) {}
 
-async function getOne(req, res) {
-  try {
-  } catch (error) {}
-}
-
 async function update(req, res) {
   try {
     const code = req.params.code;
