@@ -6,7 +6,7 @@ async function sendSMS(req, res) {
     .create({
       body: "TEST",
       from: "+18305217644",
-      to: "+84857916579",
+      to: "+84919881497",
     })
     .then((message) => {
       console.log(message);
