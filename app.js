@@ -7,7 +7,8 @@ const morganMiddleware = require("./middlewares/morgan");
 const { handleError } = require("./middlewares/errorHandler");
 const logger = require("./logger/winston.js");
 const { config } = require("./config/constant.js");
-const { createSocket } = require("./socket/socket.js");
+// const socket = require("./socket/socket.js");
+const { Server } = require("socket.io");
 const app = express();
 
 app.use(cors());
@@ -27,7 +28,12 @@ app.use(handleError);
 
 const server = http.createServer(app);
 
-createSocket(server);
+const io = new Server(server, {});
+
+io.on("connection", (socket) => {
+  require("./socket/socket.js")(socket)
+  return io
+});
 
 server.listen(config.PORT, function () {
   logger.info("Server is running", { port: config.PORT });
