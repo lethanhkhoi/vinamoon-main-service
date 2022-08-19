@@ -92,7 +92,7 @@ async function getOne(req, res, next) {
   }
 }
 
-async function processWithNearest(req, data, nearest, phone) {
+async function processWithNearest(data, nearest, phone) {
   let exist = false;
   const requests = nearest.requests.map((item) => {
     if (item.phone === phone) {
@@ -118,7 +118,6 @@ async function processWithNearest(req, data, nearest, phone) {
         pickingAddress: nearest.id,
       });
     } else {
-      data.user = req.user;
       data.pickingAddressId = nearest.id;
       processor.setStrategy(new MobileRequestNearest());
       return (result = await processor.create(data));
@@ -132,7 +131,7 @@ async function processWithNearest(req, data, nearest, phone) {
   return result;
 }
 
-async function create(req, res) {
+async function create(req, res, next) {
   try {
     let data = req.body;
     if (!data.origin) {
@@ -140,12 +139,11 @@ async function create(req, res) {
     }
 
     const processor = new RequestProcessor();
-    const phone = processor.getPhone(req);
+    const phone = data.phone;
 
     if (data.device === device.WEB) {
       processor.setStrategy(new WebRequest());
     } else if (data.device === device.MOBILE) {
-      data.user = req.user;
       processor.setStrategy(new MobileRequest());
     }
 
@@ -154,7 +152,7 @@ async function create(req, res) {
 
     if (nearest.length > 0) {
       nearest = nearest[0];
-      const result = await processWithNearest(req, data, nearest, phone);
+      const result = await processWithNearest(data, nearest, phone);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);
