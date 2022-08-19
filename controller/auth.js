@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { ErrorHandler } = require("../middlewares/errorHandler");
+const API_AUTHENTICATION = process.env.AUTHENTICATION
 async function userAuthentication(req, res, next) {
   try {
     let token = req.headers["token"];
@@ -9,7 +10,7 @@ async function userAuthentication(req, res, next) {
     }
     const response = await axios({
       method: "get",
-      url: "http://localhost:3002/verify",
+      url: `${API_AUTHENTICATION}/verify`,
       headers: {
         "Content-Type": "application/json",
         token: token,
