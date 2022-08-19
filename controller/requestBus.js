@@ -92,7 +92,7 @@ async function getOne(req, res, next) {
   }
 }
 
-async function processWithNearest(data, nearest, phone) {
+async function processWithNearest(req, data, nearest, phone) {
   let exist = false;
   const requests = nearest.requests.map((item) => {
     if (item.phone === phone) {
@@ -154,7 +154,7 @@ async function create(req, res) {
 
     if (nearest.length > 0) {
       nearest = nearest[0];
-      const result = await processWithNearest(data, nearest, phone);
+      const result = await processWithNearest(req, data, nearest, phone);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);

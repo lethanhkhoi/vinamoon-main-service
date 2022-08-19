@@ -39,7 +39,7 @@ class MobileRequest {
         location: data.origin,
         requests: [
           {
-            phone: data.user.phone,
+            phone: data.user?.phone,
             count: 1,
           },
         ],
@@ -54,8 +54,8 @@ class MobileRequest {
 
       const newRequest = {
         id: new ObjectID().toString(),
-        phone: data.user.phone,
-        name: data.user.name,
+        phone: data.user?.phone,
+        name: data.user?.name,
         vehicleId: data.vehicleId,
         pickingAddress: pickingLocation.id,
         status: requestStatus.PENDING,
@@ -84,8 +84,8 @@ class MobileRequestNearest {
     this.create = async function (data) {
       const newRequest = {
         id: new ObjectID().toString(),
-        phone: data.user.phone,
-        name: data.user.name,
+        phone: data.user?.phone,
+        name: data.user?.name,
         vehicleId: data.vehicleId,
         pickingAddress: data.pickingAddressId,
         status: requestStatus.PENDING,
