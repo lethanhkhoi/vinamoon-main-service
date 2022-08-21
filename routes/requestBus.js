@@ -18,7 +18,7 @@ commands = [
     controller: "requestBus",
     method: "post",
     api: "/requestBus",
-    middleware: [],
+    middleware: ["authentication"],
   },
   {
     name: "create",

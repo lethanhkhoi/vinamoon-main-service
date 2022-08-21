@@ -19,10 +19,11 @@ async function userAuthentication(req, res, next) {
         },
       });
       const data = response.data.data;
+      console.log("Dat", data);
       req.user = { _id: data._id, phone: data.phone, name: data.name };
       return next();
     } catch (err) {
-      throw err.data;
+      throw err.response.data;
     }
   } catch (err) {
     next(err);

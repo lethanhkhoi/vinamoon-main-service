@@ -1,4 +1,5 @@
 const requestBusCol = require("../dataModel/requestBusCol");
+const vehicleCol = require("../dataModel/vehicleCol");
 const pickingAddress = require("./pickingAddress.js");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const ObjectID = require("mongodb").ObjectId;
@@ -11,6 +12,7 @@ const {
   RequestProcessorStrategy,
 } = require("./RequestProcessorStrategy");
 const SMS = require("../utils/sms");
+const directions = require("../utils/directions");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -51,6 +53,17 @@ async function getAll(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+async function getPrice(vehicleId, start, end) {
+  const vehicle = await vehicleCol.getOne(vehicleId);
+  const distance = await directions.getDistance(start, end);
+
+  if (!distance) {
+    new ErrorHandler(204, "Cannot get distance");
+  }
+
+  return Math.round((distance * vehicle?.unitPrice) / 1000) || 0;
 }
 
 async function createFromWeb(req, res, next) {
@@ -134,6 +147,7 @@ async function processWithNearest(data, nearest, phone) {
 async function create(req, res, next) {
   try {
     let data = req.body;
+
     if (!data.origin) {
       new ErrorHandler(204, "Missing origin");
     }
@@ -172,4 +186,5 @@ module.exports = {
   createFromWeb,
   getOne,
   create,
+  getPrice,
 };

@@ -38,8 +38,10 @@ app.get("/*", (req, res) => {
 });
 
 const server = http.createServer(app);
-
 const io = new Server(server, {});
+
+// const busLogDataTransfer = require("./utils/cronjob");
+// app.use(busLogDataTransfer);
 
 io.on("connection", (socket) => {
   logger.info(`User connected. SocketId: ${socket.id}`);
@@ -50,9 +52,6 @@ io.on("connection", (socket) => {
 server.listen(config.PORT, function () {
   logger.info("Server is running", { port: config.PORT });
 });
-
-const busLogDataTransfer = require("./utils/cronjob");
-app.use(busLogDataTransfer);
 
 app.use(handleError);
 
