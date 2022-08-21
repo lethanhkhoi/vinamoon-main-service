@@ -1,5 +1,6 @@
 const { dataPagination } = require("../helperFunction/helper");
 const database = require("../utils/database");
+const { requestStatus } = require("../config/constant");
 
 const validateRequest = ["homeNo", "street", "district", "city", "vehicleId"];
 const validateRequestWithLocation = [
@@ -41,6 +42,19 @@ async function getAll() {
     };
     pipeline = dataPagination({}, sortBy, 1, 1000, joinAddress());
     const result = await database.requestModel().aggregate(pipeline).toArray();
+    return result;
+  } catch (error) {
+    return null;
+  }
+}
+async function getAllDone() {
+  try {
+    const result = await database
+      .requestModel()
+      .find({
+        status: requestStatus.DONE,
+      })
+      .toArray();
     return result;
   } catch (error) {
     return null;
@@ -103,6 +117,15 @@ async function findOneAndUpdate(code, query) {
   }
 }
 
+async function deleteMany(data) {
+  try {
+    const result = await database.requestModel().deleteMany(data);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getAll,
   create,
@@ -110,5 +133,7 @@ module.exports = {
   validateRequest,
   validateRequestWithLocation,
   findOneAndUpdate,
-  getOneByPhone
+  getOneByPhone,
+  getAllDone,
+  deleteMany,
 };

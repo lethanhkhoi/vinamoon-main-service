@@ -19,11 +19,17 @@ const config = {
   CLOUDINARY_AVATAR_PATH: "vinamoon/avatar",
 };
 
+const database = {
+  BUS: process.env.DB_BUS,
+  LOG: process.env.DB_LOG,
+};
+
 const requestStatus = {
   NEW: "New",
   PENDING: "Pending",
-  ASSIGNED: "Assigned",
-  COMPLETED: "Completed",
+  ARRIVING: "Arriving",
+  PICKED: "Picked",
+  DONE: "Done",
   CANCELED: "Canceled",
 };
 
@@ -45,6 +51,7 @@ const requestConstant = {
 
 module.exports = {
   loggerConstant,
+  database,
   config,
   requestStatus,
   device,

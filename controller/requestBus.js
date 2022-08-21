@@ -5,12 +5,12 @@ const ObjectID = require("mongodb").ObjectId;
 const { requestStatus, device } = require("../config/constant");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const {
-  RequestProcessor,
   WebRequest,
   MobileRequest,
   MobileRequestNearest,
-} = require("../controller/RequestProcessor");
-const { dataPagination } = require("../helperFunction/helper");
+  RequestProcessorStrategy,
+} = require("./RequestProcessorStrategy");
+const SMS = require("../utils/sms");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -154,7 +154,7 @@ async function create(req, res, next) {
       new ErrorHandler(204, "Missing origin");
     }
 
-    const processor = new RequestProcessor();
+    const processor = new RequestProcessorStrategy();
     const phone = data.phone;
 
     if (data.device === device.WEB) {
@@ -169,9 +169,13 @@ async function create(req, res, next) {
     if (nearest.length > 0) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone);
+
+      // await SMS.confirmBooking(phone, result.id);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);
+
+      // await SMS.confirmBooking(phone, result.id);
       return res.json({ errorCode: null, result: result });
     }
   } catch (error) {

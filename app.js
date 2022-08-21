@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const routerCustom = require("./routes/index.js");
 const database = require("./utils/database");
+const databaseLog = require("./utils/databaseLog");
 const http = require("http");
-const fs = require("fs")
-const website = fs.readFileSync("view/index.html")
+const fs = require("fs");
+const website = fs.readFileSync("view/index.html");
 const morganMiddleware = require("./middlewares/morgan");
 const { handleError } = require("./middlewares/errorHandler");
 const logger = require("./logger/winston.js");
@@ -21,31 +22,38 @@ app.use(
   })
 );
 app.use(morganMiddleware);
+
 database.connectDatabase(() => {
-  logger.info("Database connected");
-  console.log("Database connected");
+  logger.info("Database bus connected");
 });
+databaseLog.connectDatabase(() => {
+  logger.info("Database log connected");
+});
+
 routerCustom.bindRouter(app);
 app.use(express.static("./view"));
 
-app.get("/*",(req,res)=>{
-  res.send(website)
-})
-app.use(handleError);
+app.get("/*", (req, res) => {
+  res.send(website);
+});
 
 const server = http.createServer(app);
 
 const io = new Server(server, {});
 
 io.on("connection", (socket) => {
-  console.log(`User connected. SocketId: ${socket.id}`)
-  require("./socket/socket.js")(socket)
-  return io
+  logger.info(`User connected. SocketId: ${socket.id}`);
+  require("./socket/socket.js")(socket);
+  return io;
 });
 
 server.listen(config.PORT, function () {
   logger.info("Server is running", { port: config.PORT });
-  console.log("Begin listen on port %s...", config.PORT);
 });
+
+const busLogDataTransfer = require("./utils/cronjob");
+app.use(busLogDataTransfer);
+
+app.use(handleError);
 
 module.exports = app;
