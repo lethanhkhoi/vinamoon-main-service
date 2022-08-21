@@ -23,7 +23,8 @@ app.use(
     extended: true,
   })
 );
-// app.use(morganMiddleware);
+
+app.use(morganMiddleware);
 
 database.connectDatabase(() => {
   logger.info("Database bus connected");
