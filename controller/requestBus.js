@@ -3,6 +3,7 @@ const vehicleCol = require("../dataModel/vehicleCol");
 const pickingAddress = require("./pickingAddress.js");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const ObjectID = require("mongodb").ObjectId;
+const { phoneFormat } = require("../utils/formatter");
 const { requestStatus, device } = require("../config/constant");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const {
@@ -168,8 +169,13 @@ async function create(req, res, next) {
       new ErrorHandler(204, "Missing origin");
     }
 
-    const processor = new RequestProcessorStrategy();
     const phone = data.phone;
+    const smsPhone = phoneFormat(phone);
+    if (!smsPhone) {
+      new ErrorHandler(204, "Invalid phone number");
+    }
+
+    const processor = new RequestProcessorStrategy();
 
     if (data.device === device.WEB) {
       processor.setStrategy(new WebRequest());
@@ -184,12 +190,12 @@ async function create(req, res, next) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone);
 
-      // await SMS.confirmBooking(phone, result.id);
+      await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);
 
-      // await SMS.confirmBooking(phone, result.id);
+      await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     }
   } catch (error) {
