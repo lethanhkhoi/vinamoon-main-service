@@ -1,12 +1,14 @@
 require("winston-daily-rotate-file");
+require("winston-mongodb");
 const winston = require("winston");
-const { combine, timestamp, json, errors, prettyPrint } = winston.format;
-const { loggerConstant, config } = require("../config/constant");
-
+const { combine, timestamp, json, errors, prettyPrint, metadata } =
+  winston.format;
 const { Logtail } = require("@logtail/node");
 const { LogtailTransport } = require("@logtail/winston");
-
+const { loggerConstant, config, database } = require("../config/constant");
 const logtail = new Logtail(config.LOG_TOKEN);
+
+const DB_LOG = database.LOG;
 
 const errorFilter = winston.format((info, opts) => {
   return info.level === "error" ? info : false;
@@ -63,6 +65,16 @@ const logger = winston.createLogger({
       format: combine(infoFilter(), timestamp(), json()),
     }),
     new LogtailTransport(logtail),
+    new winston.transports.Console(),
+    new winston.transports.MongoDB({
+      level: "http",
+      db: DB_LOG,
+      options: {
+        useUnifiedTopology: true,
+      },
+      collection: "log",
+      format: combine(httpFilter(), timestamp(), json(), metadata()),
+    }),
   ],
   exceptionHandlers: [
     new winston.transports.DailyRotateFile({
