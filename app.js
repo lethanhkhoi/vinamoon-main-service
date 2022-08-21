@@ -12,7 +12,6 @@ const logger = require("./logger/winston.js");
 const { config } = require("./config/constant.js");
 // const socket = require("./socket/socket.js");
 const { Server } = require("socket.io");
-const busLogDataTransfer = require("./utils/cronjob");
 const app = express();
 
 app.use(cors());
@@ -38,6 +37,7 @@ app.get("/*", (req, res) => {
   res.send(website);
 });
 
+const busLogDataTransfer = require("./utils/cronjob");
 app.use(busLogDataTransfer);
 
 app.use(handleError);
