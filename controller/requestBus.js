@@ -154,12 +154,12 @@ async function create(req, res, next) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone);
 
-      await SMS.confirmBooking(phone, result.id);
+      // await SMS.confirmBooking(phone, result.id);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);
 
-      await SMS.confirmBooking(phone, result.id);
+      // await SMS.confirmBooking(phone, result.id);
       return res.json({ errorCode: null, result: result });
     }
   } catch (error) {
