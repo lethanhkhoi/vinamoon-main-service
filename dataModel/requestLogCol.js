@@ -16,8 +16,17 @@ async function create(data) {
     return null;
   }
 }
+async function insertMany(data) {
+  try {
+    const result = await database.requestLogModel().insertMany(data);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
 
 module.exports = {
   getAll,
   create,
+  insertMany,
 };

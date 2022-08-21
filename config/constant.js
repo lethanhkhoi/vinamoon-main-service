@@ -27,8 +27,9 @@ const database = {
 const requestStatus = {
   NEW: "New",
   PENDING: "Pending",
-  ASSIGNED: "Assigned",
-  COMPLETED: "Completed",
+  ARRIVING: "Arriving",
+  PICKED: "Picked",
+  DONE: "Done",
   CANCELED: "Canceled",
 };
 
