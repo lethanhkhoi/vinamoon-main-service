@@ -3,7 +3,7 @@ const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
 const { requestStatus } = require("../config/constant");
 const { getAddress } = require("../utils/googleAPI");
-class RequestProcessor {
+class RequestProcessorStrategy {
   constructor() {
     this.request = "";
   }
@@ -117,6 +117,7 @@ class WebRequest {
         requestId,
         { status: newStatus }
       );
+
       if (!resultUpdateRequest) {
         throw new ErrorHandler(204, "Cannot update request");
       }
@@ -127,7 +128,7 @@ class WebRequest {
 }
 
 module.exports = {
-  RequestProcessor,
+  RequestProcessorStrategy,
   MobileRequest,
   MobileRequestNearest,
   WebRequest,
