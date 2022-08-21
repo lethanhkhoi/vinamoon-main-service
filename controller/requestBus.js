@@ -104,6 +104,22 @@ async function getOne(req, res, next) {
     next(err);
   }
 }
+async function getOneByUser(req, res, next) {
+  try {
+    const phone = req.params.code;
+    let result = await requestBusCol.getOneByPhone(phone);
+    if (!result) {
+      new ErrorHandler(204, "Cannot find request");
+    }
+    result.map((item) => {
+      item.pickingLocation = item.pickingLocation[0];
+      item.vehicleType = item.vehicleType[0];
+    });
+    return res.json({ errorCode: null, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
 
 async function processWithNearest(data, nearest, phone) {
   let exist = false;
@@ -187,4 +203,5 @@ module.exports = {
   getOne,
   create,
   getPrice,
+  getOneByUser,
 };

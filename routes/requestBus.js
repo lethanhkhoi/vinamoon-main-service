@@ -7,6 +7,13 @@ commands = [
     middleware: ["authentication"],
   },
   {
+    name: "getOneByUser",
+    controller: "requestBus",
+    method: "get",
+    api: "/requestBus/user/:code",
+    middleware: [],
+  },
+  {
     name: "getOne",
     controller: "requestBus",
     method: "get",
