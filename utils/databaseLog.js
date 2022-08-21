@@ -11,7 +11,7 @@ async function connectDatabase(cb, next) {
     await client.connect();
     let db = client.db("log");
 
-    _logModel = db.collection("log");
+    _logModel = db.collection("main_service_log");
     _requestLogModel = db.collection("request");
 
     cb();
@@ -30,7 +30,7 @@ const requestLogModel = function () {
 
 const logModel = function () {
   if (_logModel == null) {
-    throw new ErrorHandler(500, "log table is null or undefined");
+    throw new ErrorHandler(500, "main_service_log table is null or undefined");
   } else {
     return _logModel;
   }
