@@ -5,6 +5,7 @@ const requestLogCol = require("../dataModel/requestLogCol");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 
 const busLogDataTransfer = cron.schedule("* * * *", async () => {
+  //every 1h
   try {
     const doneRequests = await requestBusCol.getAllDone();
     if (!doneRequests) {
@@ -19,6 +20,7 @@ const busLogDataTransfer = cron.schedule("* * * *", async () => {
     console.log(error);
     throw new ErrorHandler(500, error.message);
   }
+  // console.log("cron job is running");
 });
 
 module.exports = busLogDataTransfer;
