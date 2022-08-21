@@ -23,7 +23,7 @@ async function userAuthentication(req, res, next) {
       req.user = { _id: data._id, phone: data.phone, name: data.name };
       return next();
     } catch (err) {
-      throw err.response.data;
+      throw err.response?.data || err;
     }
   } catch (err) {
     next(err);
