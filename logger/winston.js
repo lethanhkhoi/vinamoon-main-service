@@ -72,8 +72,17 @@ const logger = winston.createLogger({
       options: {
         useUnifiedTopology: true,
       },
-      collection: "log",
+      collection: "main_service_log",
       format: combine(httpFilter(), timestamp(), json(), metadata()),
+    }),
+    new winston.transports.MongoDB({
+      level: "error",
+      db: DB_LOG,
+      options: {
+        useUnifiedTopology: true,
+      },
+      collection: "error_log",
+      format: combine(errorFilter(), timestamp(), json(), metadata()),
     }),
   ],
   exceptionHandlers: [
