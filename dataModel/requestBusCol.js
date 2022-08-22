@@ -138,6 +138,15 @@ async function deleteMany(data) {
   }
 }
 
+async function update(code, data) {
+  try {
+    const result = await database.requestModel().findOneAndUpdate({id: code}, {$set: data});
+    return result.value;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getAll,
   create,
@@ -149,4 +158,5 @@ module.exports = {
   getAllDone,
   getPrice,
   deleteMany,
+  update
 };

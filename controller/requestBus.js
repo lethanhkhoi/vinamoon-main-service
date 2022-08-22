@@ -189,6 +189,20 @@ async function create(req, res, next) {
     next(error);
   }
 }
+async function update(req,res,next){
+  try{
+    const code = req.params.code
+    console.log(code)
+    let data = req.body
+    const result = await requestBusCol.update(code, data)
+    if(!result){
+      new ErrorHandler(204, "Cannot update request");
+    }
+    return res.json({errorCode: null, result: {...result, ...data}})
+  }catch(error){
+    next(error)
+  }
+}
 
 module.exports = {
   getAll,
@@ -196,4 +210,5 @@ module.exports = {
   getOne,
   create,
   getOneByUser,
+  update
 };
