@@ -19,11 +19,13 @@ async function userAuthentication(req, res, next) {
         },
       });
       const data = response.data.data;
-      console.log("Dat", data);
       req.user = { _id: data._id, phone: data.phone, name: data.name };
       return next();
     } catch (err) {
-      throw err.response?.data || err;
+      throw new ErrorHandler(
+        err.response?.status || 401,
+        err.response?.data?.message || "Authentication fail, invalid token"
+      );
     }
   } catch (err) {
     next(err);
