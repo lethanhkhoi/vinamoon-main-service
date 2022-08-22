@@ -85,6 +85,10 @@ class MobileRequest {
 class MobileRequestNearest {
   constructor() {
     this.create = async function (data) {
+      const desString = await getAddress(
+        data.destination.lat,
+        data.destination.long
+      );
       const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
 
       const price = await requestBusCol.getPrice(
