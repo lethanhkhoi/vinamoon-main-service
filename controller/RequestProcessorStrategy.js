@@ -1,10 +1,10 @@
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
+const requestBus = require("../controller/requestBus.js");
 const { requestStatus } = require("../config/constant");
 const { getAddress } = require("../utils/googleAPI");
-
-class RequestProcessor {
+class RequestProcessorStrategy {
   constructor() {
     this.request = "";
   }
@@ -14,19 +14,17 @@ class RequestProcessor {
   create(data) {
     return this.request.create(data);
   }
-  getPhone(data) {
-    return this.request.getPhone(data);
-  }
 }
 
 class MobileRequest {
   constructor() {
-    this.getPhone = function (req) {
-      return req.user.phone;
-    };
-
     this.create = async function (data) {
       const address = await getAddress(data.origin.lat, data.origin.long);
+      const price = await requestBus.getPrice(
+        data.vehicleId,
+        data.origin,
+        data.destination
+      );
 
       let pickingLocation = {
         id: new ObjectID().toString(),
@@ -36,9 +34,10 @@ class MobileRequest {
         ward: "",
         city: address[3].long_name,
         location: data.origin,
+        price: price || 0,
         requests: [
           {
-            phone: data.user.phone,
+            phone: data.phone,
             count: 1,
           },
         ],
@@ -53,8 +52,8 @@ class MobileRequest {
 
       const newRequest = {
         id: new ObjectID().toString(),
-        phone: data.user.phone,
-        name: data.user.name,
+        phone: data.phone,
+        name: data.name,
         vehicleId: data.vehicleId,
         pickingAddress: pickingLocation.id,
         status: requestStatus.PENDING,
@@ -74,12 +73,40 @@ class MobileRequest {
   }
 }
 
+class MobileRequestNearest {
+  constructor() {
+    this.create = async function (data) {
+      const price = await requestBus.getPrice(
+        data.vehicleId,
+        data.origin,
+        data.destination
+      );
+
+      const newRequest = {
+        id: new ObjectID().toString(),
+        phone: data.phone,
+        name: data.name,
+        vehicleId: data.vehicleId,
+        pickingAddress: data.pickingAddressId,
+        status: requestStatus.PENDING,
+        price: price || 0,
+        destination: {
+          lat: data.destination.lat,
+          long: data.destination.long,
+        },
+      };
+
+      const createRequestResult = await requestBusCol.create(newRequest);
+      if (!createRequestResult) {
+        throw new ErrorHandler(204, "Cannot create booking request");
+      }
+      return createRequestResult;
+    };
+  }
+}
+
 class WebRequest {
   constructor() {
-    this.getPhone = function (req) {
-      return req.body.phone;
-    };
-
     this.create = async function (data) {
       const requestId = data.requestBusId;
       const addressId = data.pickingAddressId;
@@ -104,6 +131,7 @@ class WebRequest {
         requestId,
         { status: newStatus }
       );
+
       if (!resultUpdateRequest) {
         throw new ErrorHandler(204, "Cannot update request");
       }
@@ -114,7 +142,8 @@ class WebRequest {
 }
 
 module.exports = {
-  RequestProcessor,
+  RequestProcessorStrategy,
   MobileRequest,
+  MobileRequestNearest,
   WebRequest,
 };

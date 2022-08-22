@@ -1,14 +1,19 @@
 const requestBusCol = require("../dataModel/requestBusCol");
+const vehicleCol = require("../dataModel/vehicleCol");
 const pickingAddress = require("./pickingAddress.js");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const ObjectID = require("mongodb").ObjectId;
+const { phoneFormat } = require("../utils/formatter");
 const { requestStatus, device } = require("../config/constant");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const {
-  RequestProcessor,
   WebRequest,
   MobileRequest,
-} = require("../controller/RequestProcessor");
+  MobileRequestNearest,
+  RequestProcessorStrategy,
+} = require("./RequestProcessorStrategy");
+const SMS = require("../utils/sms");
+const directions = require("../utils/directions");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -51,6 +56,17 @@ async function getAll(req, res, next) {
   }
 }
 
+async function getPrice(vehicleId, start, end) {
+  const vehicle = await vehicleCol.getOne(vehicleId);
+  const distance = await directions.getDistance(start, end);
+
+  if (!distance) {
+    new ErrorHandler(204, "Cannot get distance");
+  }
+
+  return Math.round((distance * vehicle?.unitPrice) / 1000) || 0;
+}
+
 async function createFromWeb(req, res, next) {
   try {
     const data = req.body;
@@ -89,6 +105,22 @@ async function getOne(req, res, next) {
     next(err);
   }
 }
+async function getOneByUser(req, res, next) {
+  try {
+    const phone = req.params.code;
+    let result = await requestBusCol.getOneByPhone(phone);
+    if (!result) {
+      new ErrorHandler(204, "Cannot find request");
+    }
+    result.map((item) => {
+      item.pickingLocation = item.pickingLocation[0];
+      item.vehicleType = item.vehicleType[0];
+    });
+    return res.json({ errorCode: null, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
 
 async function processWithNearest(data, nearest, phone) {
   let exist = false;
@@ -109,11 +141,17 @@ async function processWithNearest(data, nearest, phone) {
     requests,
   });
 
-  if (nearest.distance > 0 && data.device === device.WEB) {
-    await pickingAddressCol.removeOneByCode(data.pickingAddressId);
-    await requestBusCol.findOneAndUpdate(data.requestBusId, {
-      pickingAddress: nearest.id,
-    });
+  if (nearest.distance > 0) {
+    if (data.device === device.WEB) {
+      await pickingAddressCol.removeOneByCode(data.pickingAddressId);
+      await requestBusCol.findOneAndUpdate(data.requestBusId, {
+        pickingAddress: nearest.id,
+      });
+    } else {
+      data.pickingAddressId = nearest.id;
+      processor.setStrategy(new MobileRequestNearest());
+      return (result = await processor.create(data));
+    }
   }
 
   const result = await requestBusCol.findOneAndUpdate(data.requestBusId, {
@@ -123,20 +161,25 @@ async function processWithNearest(data, nearest, phone) {
   return result;
 }
 
-async function create(req, res) {
+async function create(req, res, next) {
   try {
     let data = req.body;
+
     if (!data.origin) {
       new ErrorHandler(204, "Missing origin");
     }
 
-    const processor = new RequestProcessor();
-    const phone = processor.getPhone(req);
+    const phone = data.phone;
+    const smsPhone = phoneFormat(phone);
+    if (!smsPhone) {
+      new ErrorHandler(204, "Invalid phone number");
+    }
+
+    const processor = new RequestProcessorStrategy();
 
     if (data.device === device.WEB) {
       processor.setStrategy(new WebRequest());
     } else if (data.device === device.MOBILE) {
-      data.user = req.user;
       processor.setStrategy(new MobileRequest());
     }
 
@@ -146,9 +189,13 @@ async function create(req, res) {
     if (nearest.length > 0) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone);
+
+      await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);
+
+      await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     }
   } catch (error) {
@@ -161,4 +208,6 @@ module.exports = {
   createFromWeb,
   getOne,
   create,
+  getPrice,
+  getOneByUser,
 };

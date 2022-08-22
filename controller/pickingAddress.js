@@ -41,7 +41,7 @@ async function getFrequency(req, res, next) {
   }
 }
 
-async function getAll(req, res) {
+async function getAll(req, res, next) {
   try {
     const result = await pickingAddressCol.getAll();
     if (!result) {
@@ -49,11 +49,7 @@ async function getAll(req, res) {
     }
     return res.json({ errorCode: null, data: result });
   } catch (error) {
-    return res.json({
-      errorCode: true,
-      exitCode: 1,
-      data: "system error",
-    });
+    next(error);
   }
 }
 
