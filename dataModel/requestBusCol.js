@@ -1,6 +1,8 @@
 const { dataPagination } = require("../helperFunction/helper");
 const database = require("../utils/database");
 const { requestStatus } = require("../config/constant");
+const vehicleCol = require("../dataModel/vehicleCol");
+const directions = require("../utils/directions");
 
 const validateRequest = ["homeNo", "street", "district", "city", "vehicleId"];
 const validateRequestWithLocation = [
@@ -69,6 +71,16 @@ async function create(data) {
     return null;
   }
 }
+async function getPrice(vehicleId, start, end) {
+  const vehicle = await vehicleCol.getOne(vehicleId);
+  const distance = await directions.getDistance(start, end);
+
+  if (!distance) {
+    new ErrorHandler(204, "Cannot get distance");
+  }
+
+  return Math.round((distance * vehicle?.unitPrice) / 1000) || 0;
+}
 
 async function getOne(code) {
   try {
@@ -135,5 +147,6 @@ module.exports = {
   findOneAndUpdate,
   getOneByPhone,
   getAllDone,
+  getPrice,
   deleteMany,
 };
