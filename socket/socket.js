@@ -16,7 +16,7 @@ module.exports = (socket) => {
       let drivers = data.locations;
       drivers = drivers.map(driver => ({ ...driver, member: JSON.parse(driver.member) }))
       drivers = drivers.filter(driver => driver.member.typeId === request.vehicleId)
-      .forEach(driver => {
+      drivers.forEach(driver => {
         console.log(`emitting driver ${driver.member.number}`)
         socket.broadcast.emit(driver.member.number, {
           
@@ -28,7 +28,7 @@ module.exports = (socket) => {
     }
   });
 
-  socket.on("driver update", async (request) => {
+  socket.on("driver update location", async (request) => {
     try {
       console.log({
         lat: request.lat,
@@ -41,6 +41,41 @@ module.exports = (socket) => {
         label: JSON.stringify(request.vehicle)
       });
       console.log(data)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
+
+  socket.on("driver remove location", async (request) => {
+    try {
+      console.log(request)
+      const { data } = await axios.delete(`${process.env.CACHE_URL}`, {
+        label: JSON.stringify(request.vehicle)
+      });
+      console.log(data)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
+
+  socket.on("driver accept ride", async (request) => {
+    try {
+      console.log(request)
+      const { data } = await axios.delete(`${process.env.CACHE_URL}`, {
+        label: JSON.stringify(request.vehicle)
+      });
+      console.log(data)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
+
+  socket.on("driver cancel ride", async (request) => {
+    try {
+      console.log(request)
     } catch (error) {
       logger.error(error);
       next(error);
