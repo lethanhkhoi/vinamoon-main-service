@@ -3,7 +3,7 @@ const axios = require("axios");
 
 module.exports = (socket) => {
   socket.on("bookCar", (request) => {
-    try {
+    try {  
       io.emit(request.roomId, "From server");
       logger.info(`Broadcast request from user ${socket.id}`, {
         request: request,
