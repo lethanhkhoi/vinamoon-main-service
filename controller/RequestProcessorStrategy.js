@@ -41,8 +41,6 @@ class MobileRequest {
         ward: "",
         city: pickingString[3].long_name,
         location: data.origin,
-        pickingString: nicePickingString,
-        destinationString: niceDesString,
         price: price || 0,
         requests: [
           {
@@ -65,6 +63,8 @@ class MobileRequest {
         name: data.name,
         vehicleId: data.vehicleId,
         pickingAddress: pickingLocation.id,
+        pickingString: nicePickingString,
+        destinationString: niceDesString,
         status: requestStatus.PENDING,
         destination: {
           lat: data.destination.lat,
@@ -93,6 +93,10 @@ class MobileRequestNearest {
         data.destination
       );
 
+      const pickingAddressObj = await pickingAddressCol.getOneByCode(
+        data.pickingAddressId
+      );
+
       const newRequest = {
         id: new ObjectID().toString(),
         phone: data.phone,
@@ -102,6 +106,7 @@ class MobileRequestNearest {
         status: requestStatus.PENDING,
         price: price || 0,
         destinationString: niceDesString,
+        pickingString: pickingAddressObj.address,
         destination: {
           lat: data.destination.lat,
           long: data.destination.long,
