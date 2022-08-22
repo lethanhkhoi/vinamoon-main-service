@@ -66,8 +66,8 @@ class MobileRequest {
       if (!createRequestResult) {
         throw new ErrorHandler(204, "Cannot create booking request");
       }
-
-      return createRequestResult;
+      const thisRequest = await requestBusCol.getOne(newRequest.id);
+      return thisRequest;
     };
   }
 }
@@ -99,7 +99,8 @@ class MobileRequestNearest {
       if (!createRequestResult) {
         throw new ErrorHandler(204, "Cannot create booking request");
       }
-      return createRequestResult;
+      const thisRequest = await requestBusCol.getOne(newRequest.id);
+      return thisRequest;
     };
   }
 }
@@ -135,7 +136,8 @@ class WebRequest {
         throw new ErrorHandler(204, "Cannot update request");
       }
 
-      return resultUpdateRequest;
+      const thisRequest = await requestBusCol.getOne(requestId);
+      return thisRequest;
     };
   }
 }

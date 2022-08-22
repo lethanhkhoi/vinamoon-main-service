@@ -137,7 +137,7 @@ async function processWithNearest(data, nearest, phone, processor) {
     } else {
       data.pickingAddressId = nearest.id;
       processor.setStrategy(new MobileRequestNearest());
-      return (result = await processor.create(data));
+      return await processor.create(data);
     }
   }
 
