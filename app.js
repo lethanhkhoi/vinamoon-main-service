@@ -41,7 +41,13 @@ app.get("/*", (req, res) => {
 });
 
 const server = http.createServer(app);
-const io = new Server(server, {});
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: "GET,POST",
+  },
+});
 
 io.on("connection", (socket) => {
   logger.info(`User connected. SocketId: ${socket.id}`);

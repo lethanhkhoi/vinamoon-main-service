@@ -3,6 +3,7 @@ const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
 const { requestStatus } = require("../config/constant");
 const { getAddress } = require("../utils/googleAPI");
+const ObjectID = require("mongodb").ObjectId;
 class RequestProcessorStrategy {
   constructor() {
     this.request = "";
@@ -18,7 +19,14 @@ class RequestProcessorStrategy {
 class MobileRequest {
   constructor() {
     this.create = async function (data) {
-      const address = await getAddress(data.origin.lat, data.origin.long);
+      const pickingString = await getAddress(data.origin.lat, data.origin.long);
+      const desString = await getAddress(
+        data.destination.lat,
+        data.destination.long
+      );
+      const nicePickingString = `${pickingString[0].long_name} ${pickingString[1].long_name}, ${pickingString[2].long_name}, Hồ Chí Minh`;
+      const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
+
       const price = await requestBusCol.getPrice(
         data.vehicleId,
         data.origin,
@@ -27,11 +35,11 @@ class MobileRequest {
 
       let pickingLocation = {
         id: new ObjectID().toString(),
-        homeNo: address[0].long_name,
-        street: address[1].long_name,
-        district: address[2].long_name,
+        homeNo: pickingString[0].long_name,
+        street: pickingString[1].long_name,
+        district: pickingString[2].long_name,
         ward: "",
-        city: address[3].long_name,
+        city: pickingString[3].long_name,
         location: data.origin,
         price: price || 0,
         requests: [
@@ -55,6 +63,8 @@ class MobileRequest {
         name: data.name,
         vehicleId: data.vehicleId,
         pickingAddress: pickingLocation.id,
+        pickingString: nicePickingString,
+        destinationString: niceDesString,
         status: requestStatus.PENDING,
         destination: {
           lat: data.destination.lat,
@@ -75,10 +85,20 @@ class MobileRequest {
 class MobileRequestNearest {
   constructor() {
     this.create = async function (data) {
+      const desString = await getAddress(
+        data.destination.lat,
+        data.destination.long
+      );
+      const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
+
       const price = await requestBusCol.getPrice(
         data.vehicleId,
         data.origin,
         data.destination
+      );
+
+      const pickingAddressObj = await pickingAddressCol.getOneByCode(
+        data.pickingAddressId
       );
 
       const newRequest = {
@@ -89,9 +109,12 @@ class MobileRequestNearest {
         pickingAddress: data.pickingAddressId,
         status: requestStatus.PENDING,
         price: price || 0,
+        destinationString: niceDesString,
+        pickingString: pickingAddressObj.address,
         destination: {
           lat: data.destination.lat,
           long: data.destination.long,
+          address: niceDesString,
         },
       };
 
@@ -99,6 +122,7 @@ class MobileRequestNearest {
       if (!createRequestResult) {
         throw new ErrorHandler(204, "Cannot create booking request");
       }
+
       const thisRequest = await requestBusCol.getOne(newRequest.id);
       return thisRequest;
     };
@@ -108,6 +132,7 @@ class MobileRequestNearest {
 class WebRequest {
   constructor() {
     this.create = async function (data) {
+      console.log("Web", data);
       const requestId = data.requestBusId;
       const addressId = data.pickingAddressId;
 
@@ -129,7 +154,9 @@ class WebRequest {
 
       const resultUpdateRequest = await requestBusCol.findOneAndUpdate(
         requestId,
-        { status: newStatus }
+        {
+          status: newStatus,
+        }
       );
 
       if (!resultUpdateRequest) {

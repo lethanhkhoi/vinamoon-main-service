@@ -2,25 +2,42 @@ const pickingAddressCol = require("../dataModel/pickingAddressCol");
 const axios = require("axios");
 
 module.exports = (socket) => {
-  socket.on("bookCar", (request) => {
-    try {  
-      io.emit(request.roomId, "From server");
-      logger.info(`Broadcast request from user ${socket.id}`, {
-        request: request,
+  socket.on("bookCar", async (request) => {
+    try {
+      console.log('request = ', request)
+      const { data } = await axios.get(`${process.env.CACHE_URL}`, {
+        params: {
+          lat: request.origin.lat,
+          long: request.origin.long,
+          distance: 2000
+        }
       });
+      let drivers = data.locations;
+      drivers = drivers.map(driver => ({ ...driver, member: JSON.parse(driver.member) }))
+      drivers = drivers.filter(driver => driver.member.typeId === request.vehicleId)
+      drivers.forEach(driver => {
+        console.log(`emitting driver ${driver.member.number}`)
+        socket.broadcast.emit(driver.member.number, {
+          
+        })
+      })
     } catch (error) {
       logger.error(error);
       next(error);
     }
   });
 
-  socket.on("driver update", async (request) => {
+  socket.on("driver update location", async (request) => {
     try {
-      console.log(request)
+      console.log({
+        lat: request.lat,
+        long: request.long,
+        label: request.vehicle
+      })
       const { data } = await axios.post(`${process.env.CACHE_URL}`, {
         lat: request.lat,
         long: request.long,
-        label: request.driverId
+        label: JSON.stringify(request.vehicle)
       });
       console.log(data)
     } catch (error) {
@@ -29,15 +46,42 @@ module.exports = (socket) => {
     }
   });
 
-  socket.on("location", (data) => {
-    console.log(data);
-    io.emit("bookCar", data);
+  socket.on("driver remove location", async (request) => {
+    try {
+      console.log(request)
+      const { data } = await axios.delete(`${process.env.CACHE_URL}`, {
+        label: JSON.stringify(request.vehicle)
+      });
+      console.log(data)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
+
+  socket.on("driver accept ride", async (request) => {
+    try {
+      console.log(request)
+      const { data } = await axios.delete(`${process.env.CACHE_URL}`, {
+        label: JSON.stringify(request.vehicle)
+      });
+      console.log(data)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  });
+
+  socket.on("driver cancel ride", async (request) => {
+    try {
+      console.log(request)
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
   });
 
   socket.on("disconnect", () => {
-    logger.info(`User disconnected. SocketId: ${socket.id}`, {
-      socketId: socket.id,
-    });
-    console.log("User disconnected");
+    console.log("user disconnected");
   });
 }

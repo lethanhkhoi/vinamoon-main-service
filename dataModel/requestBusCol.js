@@ -16,6 +16,11 @@ const validateRequestWithLocation = [
 
 function joinAddress(aggregate = []) {
   aggregate.push({
+    $match: {
+      device: { $ne: "mobile" },
+    },
+  });
+  aggregate.push({
     $lookup: {
       from: "picking_address",
       localField: "pickingAddress",
@@ -36,6 +41,7 @@ function joinAddress(aggregate = []) {
   });
   return aggregate;
 }
+
 async function getAll() {
   try {
     let pipeline = null;
