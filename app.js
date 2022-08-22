@@ -7,11 +7,13 @@ const http = require("http");
 const fs = require("fs");
 const website = fs.readFileSync("view/index.html");
 const morganMiddleware = require("./middlewares/morgan");
-const { handleError } = require("./middlewares/errorHandler");
 const logger = require("./logger/winston.js");
 const { config } = require("./config/constant.js");
 // const socket = require("./socket/socket.js");
 const { Server } = require("socket.io");
+const busLogDataTransfer = require("./utils/cronjob");
+const { handleError } = require("./middlewares/errorHandler");
+
 const app = express();
 
 app.use(cors());
@@ -21,6 +23,7 @@ app.use(
     extended: true,
   })
 );
+
 app.use(morganMiddleware);
 
 database.connectDatabase(() => {
@@ -38,7 +41,6 @@ app.get("/*", (req, res) => {
 });
 
 const server = http.createServer(app);
-
 const io = new Server(server, {});
 
 io.on("connection", (socket) => {
@@ -51,9 +53,7 @@ server.listen(config.PORT, function () {
   logger.info("Server is running", { port: config.PORT });
 });
 
-const busLogDataTransfer = require("./utils/cronjob");
-app.use(busLogDataTransfer);
-
+busLogDataTransfer.start();
 app.use(handleError);
 
 module.exports = app;

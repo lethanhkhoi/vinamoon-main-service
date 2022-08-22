@@ -4,8 +4,8 @@ const requestBusCol = require("../dataModel/requestBusCol");
 const requestLogCol = require("../dataModel/requestLogCol");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 
-const busLogDataTransfer = cron.schedule("* * * *", async () => {
-  //every 1h
+const busLogDataTransfer = cron.schedule("*/30 * * * *", async () => {
+  // every 30min
   try {
     const doneRequests = await requestBusCol.getAllDone();
     if (!doneRequests) {

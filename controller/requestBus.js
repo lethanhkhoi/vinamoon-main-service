@@ -1,7 +1,9 @@
 const requestBusCol = require("../dataModel/requestBusCol");
+const vehicleCol = require("../dataModel/vehicleCol");
 const pickingAddress = require("./pickingAddress.js");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const ObjectID = require("mongodb").ObjectId;
+const { phoneFormat } = require("../utils/formatter");
 const { requestStatus, device } = require("../config/constant");
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const {
@@ -11,6 +13,7 @@ const {
   RequestProcessorStrategy,
 } = require("./RequestProcessorStrategy");
 const SMS = require("../utils/sms");
+const directions = require("../utils/directions");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -53,6 +56,17 @@ async function getAll(req, res, next) {
   }
 }
 
+async function getPrice(vehicleId, start, end) {
+  const vehicle = await vehicleCol.getOne(vehicleId);
+  const distance = await directions.getDistance(start, end);
+
+  if (!distance) {
+    new ErrorHandler(204, "Cannot get distance");
+  }
+
+  return Math.round((distance * vehicle?.unitPrice) / 1000) || 0;
+}
+
 async function createFromWeb(req, res, next) {
   try {
     const data = req.body;
@@ -86,6 +100,22 @@ async function getOne(req, res, next) {
     }
     result.pickingLocation = result.pickingLocation[0];
     result.vehicleType = result.vehicleType[0];
+    return res.json({ errorCode: null, data: result });
+  } catch (err) {
+    next(err);
+  }
+}
+async function getOneByUser(req, res, next) {
+  try {
+    const phone = req.params.code;
+    let result = await requestBusCol.getOneByPhone(phone);
+    if (!result) {
+      new ErrorHandler(204, "Cannot find request");
+    }
+    result.map((item) => {
+      item.pickingLocation = item.pickingLocation[0];
+      item.vehicleType = item.vehicleType[0];
+    });
     return res.json({ errorCode: null, data: result });
   } catch (err) {
     next(err);
@@ -134,12 +164,18 @@ async function processWithNearest(data, nearest, phone) {
 async function create(req, res, next) {
   try {
     let data = req.body;
+
     if (!data.origin) {
       new ErrorHandler(204, "Missing origin");
     }
 
-    const processor = new RequestProcessorStrategy();
     const phone = data.phone;
+    const smsPhone = phoneFormat(phone);
+    if (!smsPhone) {
+      new ErrorHandler(204, "Invalid phone number");
+    }
+
+    const processor = new RequestProcessorStrategy();
 
     if (data.device === device.WEB) {
       processor.setStrategy(new WebRequest());
@@ -154,12 +190,12 @@ async function create(req, res, next) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone);
 
-      await SMS.confirmBooking(phone, result.id);
+      await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     } else {
       const result = processor.create(data);
 
-      await SMS.confirmBooking(phone, result.id);
+      await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     }
   } catch (error) {
@@ -172,4 +208,6 @@ module.exports = {
   createFromWeb,
   getOne,
   create,
+  getPrice,
+  getOneByUser,
 };

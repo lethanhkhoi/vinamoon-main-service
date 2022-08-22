@@ -87,6 +87,22 @@ async function getOne(code) {
   }
 }
 
+async function getOneByPhone(phone) {
+  try {
+    const result = await database
+      .requestModel()
+      .aggregate([
+        ...joinAddress(),
+        {
+          $match: { phone: phone },
+        },
+      ])
+      .toArray();
+    return result;
+  } catch (error) {
+    return null;
+  }
+}
 async function findOneAndUpdate(code, query) {
   try {
     const result = await database.requestModel().findOneAndUpdate(
@@ -117,6 +133,7 @@ module.exports = {
   validateRequest,
   validateRequestWithLocation,
   findOneAndUpdate,
+  getOneByPhone,
   getAllDone,
   deleteMany,
 };

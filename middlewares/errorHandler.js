@@ -9,13 +9,13 @@ class ErrorHandler extends Error {
 const logger = require("../logger/winston");
 
 const handleError = (err, req, res, next) => {
-  const { statusCode, message } = err;
+  const { statusCode, message, errorCode } = err;
   logger.error(err);
 
   res.status(statusCode || 500).send({
     exitcode: 1,
+    message: statusCode || errorCode ? message : "An error occurred",
     errorCode: true,
-    message: statusCode ? message : "An error occurred",
   });
 };
 
