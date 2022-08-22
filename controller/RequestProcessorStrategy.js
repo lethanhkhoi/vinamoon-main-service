@@ -1,7 +1,6 @@
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
-const requestBus = require("../controller/requestBus.js");
 const { requestStatus } = require("../config/constant");
 const { getAddress } = require("../utils/googleAPI");
 class RequestProcessorStrategy {
@@ -20,7 +19,7 @@ class MobileRequest {
   constructor() {
     this.create = async function (data) {
       const address = await getAddress(data.origin.lat, data.origin.long);
-      const price = await requestBus.getPrice(
+      const price = await requestBusCol.getPrice(
         data.vehicleId,
         data.origin,
         data.destination
@@ -76,7 +75,7 @@ class MobileRequest {
 class MobileRequestNearest {
   constructor() {
     this.create = async function (data) {
-      const price = await requestBus.getPrice(
+      const price = await requestBusCol.getPrice(
         data.vehicleId,
         data.origin,
         data.destination
