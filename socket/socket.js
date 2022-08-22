@@ -3,9 +3,8 @@ const axios = require("axios");
 
 module.exports = (socket) => {
   socket.on("bookCar", async (request) => {
-    console.log(request)
     try {
-      console.log(request)
+      console.log('request = ', request)
       const { data } = await axios.get(`${process.env.CACHE_URL}`, {
         params: {
           lat: request.origin.lat,
