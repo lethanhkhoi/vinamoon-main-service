@@ -1,13 +1,23 @@
 const pickingAddressCol = require("../dataModel/pickingAddressCol");
 const axios = require("axios");
 
-module.exports = (socket) => {
-  socket.on("bookCar", (request) => {
+module.exports = (io, socket) => {
+  socket.on("bookCar", async (request) => {
     try {
-      io.emit(request.roomId, "From server");
-      logger.info(`Broadcast request from user ${socket.id}`, {
-        request: request,
+      console.log(request)
+      const { data } = await axios.get(`${process.env.CACHE_URL}`, {
+        params: {
+          lat: request.origin.lat,
+          long: request.origin.long,
+          distance: 2000
+      }
       });
+      drivers = data.locations;
+      drivers.forEach(driver => {
+        socket.broadcast.emit(driver.member.number, {
+          
+        })
+      })
     } catch (error) {
       logger.error(error);
       next(error);
@@ -17,27 +27,19 @@ module.exports = (socket) => {
   socket.on("driver update", async (request) => {
     try {
       console.log(request)
-      const { data } = await axios.post(`${process.env.CACHE_URL}`, {
-        lat: request.lat,
-        long: request.long,
-        label: request.driverId
-      });
-      console.log(data)
+      // const { data } = await axios.post(`${process.env.CACHE_URL}`, {
+      //   lat: request.lat,
+      //   long: request.long,
+      //   label: request.vehicle
+      // });
+      // console.log(data)
     } catch (error) {
       logger.error(error);
       next(error);
     }
   });
 
-  socket.on("location", (data) => {
-    console.log(data);
-    io.emit("bookCar", data);
-  });
-
   socket.on("disconnect", () => {
-    logger.info(`User disconnected. SocketId: ${socket.id}`, {
-      socketId: socket.id,
-    });
-    console.log("User disconnected");
+    console.log("user disconnected");
   });
 }

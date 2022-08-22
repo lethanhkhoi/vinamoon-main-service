@@ -35,11 +35,16 @@ app.use(handleError);
 
 const server = http.createServer(app);
 
-const io = new Server(server, {});
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: "GET,POST",
+  },
+});
 
 io.on("connection", (socket) => {
   console.log(`User connected. SocketId: ${socket.id}`)
-  require("./socket/socket.js")(socket)
+  require("./socket/socket.js")(io, socket)
   return io
 });
 
