@@ -24,7 +24,7 @@ class MobileRequest {
         data.destination.lat,
         data.destination.long
       );
-     
+
       const price = await requestBusCol.getPrice(
         data.vehicleId,
         data.origin,
@@ -60,24 +60,24 @@ class MobileRequest {
         pickingString: pickingString,
         destinationString: desString,
         price: data.price || price,
-        device: data.device,
+        device: "mobile",
         status: requestStatus.PENDING,
         destination: {
           lat: data.destination.lat,
           long: data.destination.long,
-          address: desString
+          address: desString,
         },
       };
 
-      console.log("id", newRequest.id)
+      console.log("id", newRequest.id);
       const createRequestResult = await requestBusCol.create(newRequest);
-      
+
       if (!createRequestResult) {
         throw new ErrorHandler(204, "Cannot create booking request");
       }
       const thisRequest = await requestBusCol.getOne(newRequest.id);
 
-      console.log("this", thisRequest)
+      console.log("this", thisRequest);
       return thisRequest;
     };
   }
@@ -108,8 +108,8 @@ class MobileRequestNearest {
         vehicleId: data.vehicleId,
         pickingAddress: data.pickingAddressId,
         status: requestStatus.PENDING,
-        price: data.price||price || 0,
-        device: device,
+        price: data.price || price || 0,
+        device: "mobile",
         destinationString: desString,
         pickingString: pickingAddressObj.address,
         destination: {

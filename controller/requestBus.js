@@ -12,6 +12,7 @@ const {
   RequestProcessorStrategy,
 } = require("./RequestProcessorStrategy");
 const SMS = require("../utils/sms");
+const logger = require("../logger/winston");
 
 const constructAddressFromWeb = (obj) => {
   const id = new ObjectID();
@@ -19,7 +20,7 @@ const constructAddressFromWeb = (obj) => {
     homeNo: obj.homeNo,
     street: obj.street,
     district: obj.district,
-    ward: obj.ward,
+    ward: obj.ward ?? "",
     address: obj.address,
     city: obj.city,
     _id: id,
@@ -188,7 +189,7 @@ async function processWithNearest(data, nearest, phone, processor) {
 async function create(req, res, next) {
   try {
     let data = req.body;
-    console.log('dev', data)
+    console.log("dev", data);
 
     if (!data.origin) {
       new ErrorHandler(204, "Missing origin");
@@ -223,17 +224,24 @@ async function create(req, res, next) {
     if (nearest.length > 0) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone, processor);
-      // const result = await requestBusCol.getOne(data.requestBusId);
-      console.log(data.requestBusId);
-      // await SMS.confirmBooking(smsPhone, result.id);
+      console.log("id ne", result.id);
+      try {
+        await SMS.confirmBooking(smsPhone, result.id);
+      } catch (error) {
+        logger.error(error);
+      }
       console.log("Here", result);
       return res.json({ errorCode: null, result: result });
     } else {
       console.log("No nearest", data);
       const result = await processor.create(data);
 
-      console.log(result);
-      // await SMS.confirmBooking(smsPhone, result.id);
+      console.log("res", result);
+      try {
+        await SMS.confirmBooking(smsPhone, result.id);
+      } catch (error) {
+        logger.error(error);
+      }
       return res.json({ errorCode: null, result: result });
     }
   } catch (error) {
@@ -243,7 +251,6 @@ async function create(req, res, next) {
 async function update(req, res, next) {
   try {
     const code = req.params.code;
-    console.log(code);
     let data = req.body;
     const result = await requestBusCol.update(code, data);
     if (!result) {
