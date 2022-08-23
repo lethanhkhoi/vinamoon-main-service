@@ -3,6 +3,7 @@ const client = new Client({});
 
 const getAddress = async (lat, lng) => {
   try {
+    return '';
     const response = await client.geocode({
       params: {
         latlng: `${lat},${lng}`,

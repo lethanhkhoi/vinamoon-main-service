@@ -19,15 +19,15 @@ class RequestProcessorStrategy {
 class MobileRequest {
   constructor() {
     this.create = async function (data) {
-      const pickingString = await getAddress(data.origin.lat, data.origin.long);
-      const desString = await getAddress(
-        data.destination.lat,
-        data.destination.long
-      );
-      const nicePickingString = `${pickingString[0].long_name} ${pickingString[1].long_name}, ${pickingString[2].long_name}, Hồ Chí Minh`;
-      const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
+      // const pickingString = await getAddress(data.origin.lat, data.origin.long);
+      // const desString = await getAddress(
+      //   data.destination.lat,
+      //   data.destination.long
+      // );
+      // const nicePickingString = `${pickingString[0].long_name} ${pickingString[1].long_name}, ${pickingString[2].long_name}, Hồ Chí Minh`;
+      // const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
 
-      const price = await requestBusCol.getPrice(
+      const price = await requestBusCol.getAddressPrice(
         data.vehicleId,
         data.origin,
         data.destination
@@ -63,8 +63,8 @@ class MobileRequest {
         name: data.name,
         vehicleId: data.vehicleId,
         pickingAddress: pickingLocation.id,
-        pickingString: nicePickingString,
-        destinationString: niceDesString,
+        // pickingString: nicePickingString,
+        // destinationString: niceDesString,
         status: requestStatus.PENDING,
         destination: {
           lat: data.destination.lat,
@@ -85,11 +85,11 @@ class MobileRequest {
 class MobileRequestNearest {
   constructor() {
     this.create = async function (data) {
-      const desString = await getAddress(
-        data.destination.lat,
-        data.destination.long
-      );
-      const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
+      // const desString = await getAddress(
+      //   data.destination.lat,
+      //   data.destination.long
+      // );
+      // const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
 
       const price = await requestBusCol.getPrice(
         data.vehicleId,
@@ -109,12 +109,12 @@ class MobileRequestNearest {
         pickingAddress: data.pickingAddressId,
         status: requestStatus.PENDING,
         price: price || 0,
-        destinationString: niceDesString,
+        // destinationString: niceDesString,
         pickingString: pickingAddressObj.address,
         destination: {
           lat: data.destination.lat,
           long: data.destination.long,
-          address: niceDesString,
+          // address: niceDesString,
         },
       };
 

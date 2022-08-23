@@ -9,17 +9,16 @@ module.exports = (socket) => {
         params: {
           lat: request.origin.lat,
           long: request.origin.long,
-          distance: 2000
+          distance: 10000
         }
       });
       let drivers = data.locations;
       drivers = drivers.map(driver => ({ ...driver, member: JSON.parse(driver.member) }))
       drivers = drivers.filter(driver => driver.member.typeId === request.vehicleId)
+      
       drivers.forEach(driver => {
         console.log(`emitting driver ${driver.member.number}`)
-        socket.broadcast.emit(driver.member.number, {
-          
-        })
+        socket.broadcast.emit(driver.member.number, request)
       })
     } catch (error) {
       logger.error(error);
@@ -61,11 +60,12 @@ module.exports = (socket) => {
 
   socket.on("driver accept ride", async (request) => {
     try {
-      console.log(request)
+      console.log('driver accept', JSON.stringify(request.user.vehicle))
       const { data } = await axios.delete(`${process.env.CACHE_URL}`, {
-        label: JSON.stringify(request.vehicle)
+        label: JSON.stringify(request.user.vehicle)
       });
-      console.log(data)
+      console.log(`emitting ${request.roomId}`)
+      socket.broadcast.emit(request.roomId, request)
     } catch (error) {
       logger.error(error);
       next(error);
@@ -75,6 +75,9 @@ module.exports = (socket) => {
   socket.on("driver cancel ride", async (request) => {
     try {
       console.log(request)
+      socket.broadcast.emit(request.roomId, {
+        status: 'Canceled'
+      })
     } catch (error) {
       logger.error(error);
       next(error);
