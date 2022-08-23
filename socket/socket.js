@@ -84,6 +84,9 @@ module.exports = (socket) => {
       await axios.patch(`http://localhost:3001/requestBus/${request.roomId}`, {
         status: "Canceled"
       });
+      socket.broadcast.emit(request.roomId, {
+        status: "Canceled"
+      })
     } catch (error) {
       logger.error(error);
       next(error);
