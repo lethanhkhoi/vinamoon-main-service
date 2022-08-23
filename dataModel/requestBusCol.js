@@ -16,6 +16,11 @@ const validateRequestWithLocation = [
 
 function joinAddress(aggregate = []) {
   aggregate.push({
+    $match: {
+      device: { $ne: "mobile" },
+    },
+  });
+  aggregate.push({
     $lookup: {
       from: "picking_address",
       localField: "pickingAddress",
@@ -36,6 +41,7 @@ function joinAddress(aggregate = []) {
   });
   return aggregate;
 }
+
 async function getAll() {
   try {
     let pipeline = null;
@@ -138,6 +144,15 @@ async function deleteMany(data) {
   }
 }
 
+async function update(code, data) {
+  try {
+    const result = await database.requestModel().findOneAndUpdate({id: code}, {$set: data});
+    return result.value;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getAll,
   create,
@@ -149,4 +164,5 @@ module.exports = {
   getAllDone,
   getPrice,
   deleteMany,
+  update
 };
