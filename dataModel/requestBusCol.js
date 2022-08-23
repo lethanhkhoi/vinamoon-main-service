@@ -17,7 +17,7 @@ const validateRequestWithLocation = [
 function joinAddress(aggregate = []) {
   aggregate.push({
     $match: {
-      device: { $ne: "mobile" },
+      device: { $eq: "web" },
     },
   });
   aggregate.push({

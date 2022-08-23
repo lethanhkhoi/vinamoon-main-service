@@ -50,6 +50,7 @@ async function getAll(req, res, next) {
       pickingLocation: item.pickingLocation[0],
       vehicleType: item.vehicleType[0],
     }));
+    console.log("hihi",result)
     return res.json({ errorCode: null, data: result });
   } catch (error) {
     next(error);
@@ -177,15 +178,15 @@ async function processWithNearest(data, nearest, phone, processor) {
     });
   }
 
-  const result = await requestBusCol.findOneAndUpdate(data.requestBusId, {
+  await requestBusCol.findOneAndUpdate(data.requestBusId, {
     status: requestStatus.PENDING,
   });
 
+  const result = requestBusCol.getOne(data.requestBusId);
   return result;
 }
 
 async function create(req, res, next) {
-  console.log("create", req.body);
   try {
     let data = req.body;
 
@@ -221,13 +222,13 @@ async function create(req, res, next) {
 
     if (nearest.length > 0) {
       nearest = nearest[0];
-      const result = await processWithNearest(data, nearest, phone, processor);
-
+      await processWithNearest(data, nearest, phone, processor);
+      const result = await requestBusCol.getOne(data.requestBusId);
       // await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     } else {
       console.log("No nearest", data);
-      const result = processor.create(data);
+      const result = await processor.create(data);
 
       // await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
