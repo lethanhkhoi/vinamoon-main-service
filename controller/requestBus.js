@@ -219,24 +219,18 @@ async function create(req, res, next) {
 
     const location = data.origin;
     let nearest = await pickingAddressCol.getNearest(location);
-    console.log("Nearest", nearest);
 
     if (nearest.length > 0) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone, processor);
-      console.log("id ne", result.id);
       try {
         await SMS.confirmBooking(smsPhone, result.id);
       } catch (error) {
         logger.error(error);
       }
-      console.log("Here", result);
       return res.json({ errorCode: null, result: result });
     } else {
-      console.log("No nearest", data);
       const result = await processor.create(data);
-
-      console.log("res", result);
       try {
         await SMS.confirmBooking(smsPhone, result.id);
       } catch (error) {
