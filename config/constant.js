@@ -9,6 +9,7 @@ const loggerConstant = {
 const config = {
   PORT: process.env.PORT || 3001,
   LOG_TOKEN: process.env.LOG_TOKEN,
+  ORS_KEY: process.env.OPEN_ROUTE_SERVICE_KEY,
   DEFAULT_PASSWORD: process.env.DEFAULT_PASSWORD,
 
   COULDINARY_CONFIG: {
