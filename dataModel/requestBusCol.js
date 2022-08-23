@@ -16,8 +16,31 @@ const validateRequestWithLocation = [
 
 function joinAddress(aggregate = []) {
   aggregate.push({
+    $lookup: {
+      from: "picking_address",
+      localField: "pickingAddress",
+      foreignField: "id",
+      as: "pickingLocation",
+    },
+  });
+  aggregate.push({
+    $lookup: {
+      from: "vehicle_type",
+      localField: "vehicleId",
+      foreignField: "id",
+      as: "vehicleType",
+    },
+  });
+  aggregate.push({
+    $unwind: { path: "$request", preserveNullAndEmptyArrays: true },
+  });
+  return aggregate;
+}
+
+function joinAddressGetWeb(aggregate = []) {
+  aggregate.push({
     $match: {
-      device: { $ne: "mobile" },
+      device: { $eq: "web" },
     },
   });
   aggregate.push({
@@ -48,7 +71,7 @@ async function getAll() {
     const sortBy = {
       createdAt: -1,
     };
-    pipeline = dataPagination({}, sortBy, 1, 1000, joinAddress());
+    pipeline = dataPagination({}, sortBy, 1, 1000, joinAddressGetWeb());
     const result = await database.requestModel().aggregate(pipeline).toArray();
     return result;
   } catch (error) {

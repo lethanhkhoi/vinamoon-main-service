@@ -1,7 +1,7 @@
 const { ErrorHandler } = require("../middlewares/errorHandler");
 const pickingAddressCol = require("../dataModel/pickingAddressCol.js");
 const requestBusCol = require("../dataModel/requestBusCol.js");
-const { requestStatus } = require("../config/constant");
+const { requestStatus, device } = require("../config/constant");
 const { getAddress } = require("../utils/googleAPI");
 const ObjectID = require("mongodb").ObjectId;
 class RequestProcessorStrategy {
@@ -24,9 +24,7 @@ class MobileRequest {
         data.destination.lat,
         data.destination.long
       );
-      const nicePickingString = `${pickingString[0].long_name} ${pickingString[1].long_name}, ${pickingString[2].long_name}, Hồ Chí Minh`;
-      const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
-
+     
       const price = await requestBusCol.getPrice(
         data.vehicleId,
         data.origin,
@@ -35,13 +33,8 @@ class MobileRequest {
 
       let pickingLocation = {
         id: new ObjectID().toString(),
-        homeNo: pickingString[0].long_name,
-        street: pickingString[1].long_name,
-        district: pickingString[2].long_name,
-        ward: "",
-        city: pickingString[3].long_name,
+        address: pickingString,
         location: data.origin,
-        price: price || 0,
         requests: [
           {
             phone: data.phone,
@@ -53,6 +46,7 @@ class MobileRequest {
       const createAddressResult = await pickingAddressCol.create(
         pickingLocation
       );
+
       if (!createAddressResult) {
         throw new ErrorHandler(204, "Cannot create picking address");
       }
@@ -63,20 +57,27 @@ class MobileRequest {
         name: data.name,
         vehicleId: data.vehicleId,
         pickingAddress: pickingLocation.id,
-        pickingString: nicePickingString,
-        destinationString: niceDesString,
+        pickingString: pickingString,
+        destinationString: desString,
+        price: data.price || price,
+        device: data.device,
         status: requestStatus.PENDING,
         destination: {
           lat: data.destination.lat,
           long: data.destination.long,
+          address: desString
         },
       };
 
+      console.log("id", newRequest.id)
       const createRequestResult = await requestBusCol.create(newRequest);
+      
       if (!createRequestResult) {
         throw new ErrorHandler(204, "Cannot create booking request");
       }
       const thisRequest = await requestBusCol.getOne(newRequest.id);
+
+      console.log("this", thisRequest)
       return thisRequest;
     };
   }
@@ -89,7 +90,6 @@ class MobileRequestNearest {
         data.destination.lat,
         data.destination.long
       );
-      const niceDesString = `${desString[0].long_name} ${desString[1].long_name}, ${desString[2].long_name}, Hồ Chí Minh`;
 
       const price = await requestBusCol.getPrice(
         data.vehicleId,
@@ -108,13 +108,14 @@ class MobileRequestNearest {
         vehicleId: data.vehicleId,
         pickingAddress: data.pickingAddressId,
         status: requestStatus.PENDING,
-        price: price || 0,
-        destinationString: niceDesString,
+        price: data.price||price || 0,
+        device: device,
+        destinationString: desString,
         pickingString: pickingAddressObj.address,
         destination: {
           lat: data.destination.lat,
           long: data.destination.long,
-          address: niceDesString,
+          address: desString,
         },
       };
 

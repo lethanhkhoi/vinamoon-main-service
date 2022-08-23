@@ -50,6 +50,7 @@ async function getAll(req, res, next) {
       pickingLocation: item.pickingLocation[0],
       vehicleType: item.vehicleType[0],
     }));
+    console.log("hihi", result);
     return res.json({ errorCode: null, data: result });
   } catch (error) {
     next(error);
@@ -147,22 +148,20 @@ async function processWithNearest(data, nearest, phone, processor) {
     requests,
   });
 
-  if (distance > 0) {
-    if (data.device === device.WEB) {
-      await pickingAddressCol.removeOneByCode(data.pickingAddressId);
-      await requestBusCol.findOneAndUpdate(data.requestBusId, {
-        pickingAddress: nearest.id,
-        origin: {
-          long,
-          lat,
-          address: `${nearest.address}`,
-        },
-      });
-    } else {
-      data.pickingAddressId = nearest.id;
-      processor.setStrategy(new MobileRequestNearest());
-      return await processor.create(data);
-    }
+  if (distance > 0 && data.device === device.WEB) {
+    await pickingAddressCol.removeOneByCode(data.pickingAddressId);
+    await requestBusCol.findOneAndUpdate(data.requestBusId, {
+      pickingAddress: nearest.id,
+      origin: {
+        long,
+        lat,
+        address: `${nearest.address}`,
+      },
+    });
+  } else {
+    data.pickingAddressId = nearest.id;
+    processor.setStrategy(new MobileRequestNearest());
+    return await processor.create(data);
   }
 
   if (nearest.id !== data.pickingAddressId) {
@@ -177,17 +176,19 @@ async function processWithNearest(data, nearest, phone, processor) {
     });
   }
 
-  const result = await requestBusCol.findOneAndUpdate(data.requestBusId, {
+  console.log("jiz", data.requestBusId);
+  await requestBusCol.findOneAndUpdate(data.requestBusId, {
     status: requestStatus.PENDING,
   });
 
+  const result = requestBusCol.getOne(data.requestBusId);
   return result;
 }
 
 async function create(req, res, next) {
-  console.log("create", req.body);
   try {
     let data = req.body;
+    console.log('dev', data)
 
     if (!data.origin) {
       new ErrorHandler(204, "Missing origin");
@@ -222,13 +223,16 @@ async function create(req, res, next) {
     if (nearest.length > 0) {
       nearest = nearest[0];
       const result = await processWithNearest(data, nearest, phone, processor);
-
+      // const result = await requestBusCol.getOne(data.requestBusId);
+      console.log(data.requestBusId);
       // await SMS.confirmBooking(smsPhone, result.id);
+      console.log("Here", result);
       return res.json({ errorCode: null, result: result });
     } else {
       console.log("No nearest", data);
-      const result = processor.create(data);
+      const result = await processor.create(data);
 
+      console.log(result);
       // await SMS.confirmBooking(smsPhone, result.id);
       return res.json({ errorCode: null, result: result });
     }
@@ -236,18 +240,18 @@ async function create(req, res, next) {
     next(error);
   }
 }
-async function update(req,res,next){
-  try{
-    const code = req.params.code
-    console.log(code)
-    let data = req.body
-    const result = await requestBusCol.update(code, data)
-    if(!result){
+async function update(req, res, next) {
+  try {
+    const code = req.params.code;
+    console.log(code);
+    let data = req.body;
+    const result = await requestBusCol.update(code, data);
+    if (!result) {
       new ErrorHandler(204, "Cannot update request");
     }
-    return res.json({errorCode: null, result: {...result, ...data}})
-  }catch(error){
-    next(error)
+    return res.json({ errorCode: null, result: { ...result, ...data } });
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -257,5 +261,5 @@ module.exports = {
   getOne,
   create,
   getOneByUser,
-  update
+  update,
 };
