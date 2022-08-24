@@ -8,6 +8,7 @@ const fs = require("fs");
 const website = fs.readFileSync("view/index.html");
 const morganMiddleware = require("./middlewares/morgan");
 const logger = require("./logger/winston.js");
+// const morganBody = require("morgan-body");
 const { config } = require("./config/constant.js");
 // const socket = require("./socket/socket.js");
 const { Server } = require("socket.io");
@@ -24,11 +25,22 @@ app.use(
   })
 );
 
+// const loggerStream = {
+//   write: (message) => {
+//     logger.info(message);
+//   },
+// };
+
+// morganBody(app, {
+//   stream: loggerStream,
+// });
+
 app.use(morganMiddleware);
 
 database.connectDatabase(() => {
   logger.info("Database bus connected");
 });
+
 databaseLog.connectDatabase(() => {
   logger.info("Database log connected");
 });
