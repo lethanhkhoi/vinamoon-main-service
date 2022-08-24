@@ -72,15 +72,20 @@ module.exports = (socket) => {
   socket.on("driver accept ride", async (request) => {
     try {
       console.log('driver accept', request)
-      await axios.post('`http://localhost:3001/sms/', {
-        to: request.phone,
-        requestId: request.roomId,
-        drvier: {
-          "name": request.user.name,
-          "phone": request.user.phone,
-          "vehicle": `${request.user.vehicle.brand} ${request.user.vehicle.number}`
-        }
-      });
+      try {
+        await axios.post('http://localhost:3001/sms', {
+          to: request.phone,
+          requestId: request.roomId,
+          driver: {
+            name: request.user.name,
+            phone: request.user.phone,
+            vehicle: `${request.user.vehicle.brand} ${request.user.vehicle.number}`
+          }
+        });
+      }
+      catch (error) {
+        console.log('sms', error)
+      }
       const { data } = await axios.delete(`${process.env.CACHE_URL}`, { data:
         {
           label: JSON.stringify(request.user.vehicle)
