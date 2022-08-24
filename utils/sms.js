@@ -21,6 +21,19 @@ const SMS = {
     });
     return result;
   },
+
+  async pickUp(to, id, driver) {
+    const result = await client.messages.create({
+      body: `[VINAMOON]\n
+      Tài xế ${driver.name} đã nhận chuyến\n
+      SĐT tài xế: ${driver.phone}\n
+      Biển số xe: ${driver.vehicle}\n
+      Mã cuốc: ${id}\n`,
+      from: "+18305217644",
+      to: to,
+    });
+    return result;
+  },
 };
 
 module.exports = SMS;
