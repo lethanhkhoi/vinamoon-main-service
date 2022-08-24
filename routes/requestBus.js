@@ -1,5 +1,12 @@
 commands = [
   {
+    name: "update",
+    controller: "requestBus",
+    method: "patch",
+    api: "/requestBus/:code",
+    middleware: [],
+  },
+  {
     name: "getAll",
     controller: "requestBus",
     method: "get",
