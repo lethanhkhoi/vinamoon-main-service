@@ -72,11 +72,20 @@ module.exports = (socket) => {
   socket.on("driver accept ride", async (request) => {
     try {
       console.log('driver accept', request)
-      // const { data } = await axios.delete(`${process.env.CACHE_URL}`, { data:
-      //   {
-      //     label: JSON.stringify(request.user.vehicle)
-      //   }
-      // });
+      await axios.post('`http://localhost:3001/sms/', {
+        to: request.phone,
+        requestId: request.roomId,
+        drvier: {
+          "name": request.user.name,
+          "phone": request.user.phone,
+          "vehicle": `${request.user.vehicle.brand} ${request.user.vehicle.number}`
+        }
+      });
+      const { data } = await axios.delete(`${process.env.CACHE_URL}`, { data:
+        {
+          label: JSON.stringify(request.user.vehicle)
+        }
+      });
       console.log('debug', request.roomId)
       await axios.patch(`http://localhost:3001/requestBus/${request.roomId}`, {
         driver: {
