@@ -51,7 +51,6 @@ async function getAll(req, res, next) {
       pickingLocation: item.pickingLocation[0],
       vehicleType: item.vehicleType[0],
     }));
-    console.log("hihi", result);
     return res.json({ errorCode: null, data: result });
   } catch (error) {
     next(error);
@@ -189,7 +188,6 @@ async function processWithNearest(data, nearest, phone, processor) {
 async function create(req, res, next) {
   try {
     let data = req.body;
-    console.log("dev", data);
 
     if (!data.origin) {
       new ErrorHandler(204, "Missing origin");
