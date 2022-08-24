@@ -3,6 +3,7 @@ const axios = require("axios");
 
 module.exports = (socket) => {
   socket.on("bookCar", async (request) => {
+    console.log('bookCar', request)
     try {
       if (request.status == 'Canceled') {
         await axios.patch(`http://localhost:3001/requestBus/${request.id}`, {

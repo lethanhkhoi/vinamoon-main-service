@@ -133,7 +133,6 @@ class MobileRequestNearest {
 class WebRequest {
   constructor() {
     this.create = async function (data) {
-      console.log("Web", data);
       const requestId = data.requestBusId;
       const addressId = data.pickingAddressId;
 
