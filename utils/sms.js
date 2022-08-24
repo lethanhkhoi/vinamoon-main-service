@@ -5,7 +5,7 @@ const SMS = {
   async sendSms(to, body) {
     const result = await client.messages.create({
       body: body,
-      from: "+18305217644",
+      from: "+13254425521",
       to: to,
     });
     return result;
@@ -16,7 +16,7 @@ const SMS = {
       body: `[VINAMOON]\n
       Cuốc xe đã được tạo. Chúng tôi đang tìm tài xế cho bạn...\n
       Mã cuốc: ${requestId}\n`,
-      from: "+18305217644",
+      from: "+13254425521",
       to: to,
     });
     return result;
