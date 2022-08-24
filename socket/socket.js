@@ -4,9 +4,8 @@ const axios = require("axios");
 module.exports = (socket) => {
   socket.on("bookCar", async (request) => {
     try {
-      console.log('request', request)
       if (request.status == 'Canceled') {
-        await axios.patch(`http://localhost:3001/requestBus/${request.roomId}`, {
+        await axios.patch(`http://localhost:3001/requestBus/${request.id}`, {
           status: "Canceled"
         });
       }
@@ -17,6 +16,7 @@ module.exports = (socket) => {
           distance: 4000
         }
       });
+      console.log('data', data)
       let drivers = data.locations;
       drivers = drivers.map(driver => ({ ...driver, member: JSON.parse(driver.member) }))
       drivers = drivers.filter(driver => driver.member.typeId === request.vehicleId)
@@ -72,16 +72,17 @@ module.exports = (socket) => {
   socket.on("driver accept ride", async (request) => {
     try {
       console.log('driver accept', request)
-      const { data } = await axios.delete(`${process.env.CACHE_URL}`, { data:
-        {
-          label: JSON.stringify(request.user.vehicle)
-        }
-      });
+      // const { data } = await axios.delete(`${process.env.CACHE_URL}`, { data:
+      //   {
+      //     label: JSON.stringify(request.user.vehicle)
+      //   }
+      // });
       console.log('debug', request.roomId)
       await axios.patch(`http://localhost:3001/requestBus/${request.roomId}`, {
         driver: {
           name: request.user.name,
-          phone: request.user.phone
+          phone: request.user.phone,
+          avatarPath: request.user.avatarPath
         },
         status: "Arriving"
       });
