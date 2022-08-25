@@ -35,7 +35,7 @@ const constructRequestFromWeb = (obj) => {
     name: obj.name,
     vehicleId: obj.vehicleId,
     date: new Date(),
-    status: requestStatus.NEW,
+    status: obj?.status || requestStatus.NEW,
     tmpDestination: obj.tmpDestination,
     device: obj.device || device.WEB,
     _id: id,
